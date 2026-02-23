@@ -366,7 +366,7 @@ export default function ProductDetailsPage({
               </div>
 
               {/* EMI Quick Info */}
-              <Link href="#emi-tab">
+              <Link href="#emi-tab" className="block">
                 <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/5 border border-primary/15 hover:bg-primary/10 transition-colors cursor-pointer">
                   <CreditCard className="h-5 w-5 text-primary shrink-0" />
                   <div className="flex-1">
@@ -522,7 +522,7 @@ export default function ProductDetailsPage({
       <section className="border-t border-border/40 bg-muted/20">
         <div className="container mx-auto px-4 py-8 md:py-12">
           <Tabs defaultValue="description">
-            <TabsList className="w-full justify-start bg-transparent border-b border-border/40 rounded-none p-0 h-auto gap-0">
+            <TabsList className="w-full justify-start bg-transparent border-b border-border/40 rounded-none p-0 h-auto gap-0 overflow-x-auto flex-nowrap">
               {[
                 { value: "description", label: "বিবরণ" },
                 { value: "emi", label: "EMI ক্যালকুলেটর" },
@@ -535,7 +535,7 @@ export default function ProductDetailsPage({
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-6 py-3 text-sm font-medium"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-3 sm:px-6 py-3 text-xs sm:text-sm font-medium whitespace-nowrap shrink-0"
                 >
                   {tab.label}
                 </TabsTrigger>

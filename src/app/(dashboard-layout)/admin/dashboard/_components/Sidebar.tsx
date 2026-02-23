@@ -73,7 +73,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <img
               src="/logo.png"
               alt="Mobile GANJ"
-              className="h-10 w-auto object-contain scale-200"
+              className="h-10 w-auto object-contain scale-200 logo-adaptive"
             />
           </Link>
           <Button
@@ -108,7 +108,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     : "hover:bg-accent text-muted-foreground hover:text-foreground",
                 )}
               >
-                <Icon className="w-5 h-5 flex-shrink-0" />
+                <Icon className="w-5 h-5 shrink-0" />
                 <span className="font-medium">{item.label}</span>
                 {item.adminOnly && (
                   <span className="ml-auto text-xs bg-orange-500 text-white px-2 py-0.5 rounded">
