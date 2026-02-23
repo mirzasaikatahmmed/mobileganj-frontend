@@ -485,7 +485,7 @@ export default function Header() {
           <div className="container mx-auto px-4 h-16 flex items-center">
             {/* Logo — Left */}
             <Link href="/" className="shrink-0 mr-8 scale-200 ml-10">
-              <img src="/logo.png" alt="Mobile GANJ" className="h-9 w-auto" />
+              <img src="/logo.png" alt="Mobile GANJ" className="h-9 w-auto logo-adaptive" />
             </Link>
 
             {/* Search Bar — Center (takes remaining space) */}
