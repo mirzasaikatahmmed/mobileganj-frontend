@@ -10,12 +10,22 @@ import {
   PiggyBank,
   Truck,
   Wrench,
+  Calendar,
+  GitBranch,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import StatCard from "./_components/StatCard";
 import QuickActions from "./_components/QuickActions";
 import RecentSales from "./_components/RecentSales";
 import DueList from "./_components/DueList";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useBranches } from "@/hooks/use-branches";
 
 const container = {
   hidden: { opacity: 0 },
@@ -33,6 +43,9 @@ const item = {
 };
 
 export default function DashboardPage() {
+  const { data: branches, isLoading } = useBranches();
+  const activeBranches = branches?.filter((b) => b.isActive) ?? [];
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -40,11 +53,58 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
       >
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome back! Here's your business overview.
-        </p>
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground">
+            Welcome back! Here's your business overview.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Select defaultValue="all">
+            <SelectTrigger className="w-40 sm:w-[180px]">
+              <GitBranch className="w-4 h-4 mr-2" />
+              <SelectValue placeholder="Select Branch" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Branches</SelectItem>
+              {isLoading ? (
+                <SelectItem value="loading" disabled>
+                  Loading...
+                </SelectItem>
+              ) : activeBranches.length > 0 ? (
+                activeBranches.map((branch) => (
+                  <SelectItem key={branch.id} value={branch.id.toString()}>
+                    {branch.name}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="none" disabled>
+                  No branches found
+                </SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+
+          <Select defaultValue="today">
+            <SelectTrigger className="w-40 sm:w-[180px]">
+              <Calendar className="w-4 h-4 mr-2" />
+              <SelectValue placeholder="Select Date" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="yesterday">Yesterday</SelectItem>
+              <SelectItem value="7days">Last 7 Days</SelectItem>
+              <SelectItem value="30days">Last 30 Days</SelectItem>
+              <SelectItem value="month">This Month</SelectItem>
+              <SelectItem value="lastmonth">Last Month</SelectItem>
+              <SelectItem value="year">This Year</SelectItem>
+              <SelectItem value="custom">Custom Range</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </motion.div>
 
       {/* Stats Grid */}
