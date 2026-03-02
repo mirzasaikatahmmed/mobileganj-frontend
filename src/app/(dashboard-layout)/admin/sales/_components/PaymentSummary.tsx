@@ -5,8 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-export default function PaymentSummary() {
-  const [subtotal] = useState(196000);
+interface PaymentSummaryProps {
+  subtotal: number;
+}
+
+export default function PaymentSummary({ subtotal }: PaymentSummaryProps) {
   const [discount, setDiscount] = useState(0);
   const [discountType, setDiscountType] = useState<'fixed' | 'percent'>('fixed');
   const [paid, setPaid] = useState(0);

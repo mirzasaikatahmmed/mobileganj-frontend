@@ -1,23 +1,97 @@
 'use client';
 
 import { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Plus, UserPlus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 export default function CustomerSearch() {
   const [phone, setPhone] = useState('');
   const [showNewCustomer, setShowNewCustomer] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newCustomerName, setNewCustomerName] = useState('');
+  const [newCustomerPhone, setNewCustomerPhone] = useState('');
+  const [newCustomerAddress, setNewCustomerAddress] = useState('');
 
   const handlePhoneChange = (value: string) => {
     setPhone(value);
-    // Simulate checking if customer exists
     setShowNewCustomer(value.length === 11);
+  };
+
+  const handleCreateCustomer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCustomerName.trim() || !newCustomerPhone.trim()) {
+      toast.error('Name and phone are required');
+      return;
+    }
+    toast.success('Customer created successfully');
+    setPhone(newCustomerPhone);
+    setIsModalOpen(false);
+    setNewCustomerName('');
+    setNewCustomerPhone('');
+    setNewCustomerAddress('');
   };
 
   return (
     <div className="card-base p-6 space-y-4">
-      <h3 className="font-semibold text-lg">Customer Information</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-lg">Customer Information</h3>
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" variant="outline">
+              <UserPlus className="w-4 h-4 mr-2" />
+              Add Customer
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Customer</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleCreateCustomer} className="space-y-4">
+              <div>
+                <Label htmlFor="name">Customer Name *</Label>
+                <Input
+                  id="name"
+                  value={newCustomerName}
+                  onChange={(e) => setNewCustomerName(e.target.value)}
+                  placeholder="Enter customer name"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="phone">Phone Number *</Label>
+                <Input
+                  id="phone"
+                  value={newCustomerPhone}
+                  onChange={(e) => setNewCustomerPhone(e.target.value)}
+                  placeholder="Enter phone number"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="address">Address</Label>
+                <Input
+                  id="address"
+                  value={newCustomerAddress}
+                  onChange={(e) => setNewCustomerAddress(e.target.value)}
+                  placeholder="Enter address (optional)"
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  Create Customer
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
       
       <div>
         <Label>Customer Phone *</Label>

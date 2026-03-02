@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Calendar, ChevronDown, User, Menu, LogOut, Settings, LayoutDashboard } from 'lucide-react';
+import { Bell, ChevronDown, User, Menu, LogOut, Settings, LayoutDashboard, Plus, ShoppingCart, Package, Users as UsersIcon, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 import {
@@ -29,30 +29,32 @@ export default function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
           <Menu className="w-5 h-5" />
         </Button>
 
-        <Select defaultValue="all">
-          <SelectTrigger className="w-[140px] md:w-[180px] hidden sm:flex">
-            <SelectValue placeholder="Select Branch" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Branches</SelectItem>
-            <SelectItem value="main">Main Branch</SelectItem>
-            <SelectItem value="branch1">Branch 1</SelectItem>
-            <SelectItem value="branch2">Branch 2</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select defaultValue="today">
-          <SelectTrigger className="w-[140px] md:w-[180px] hidden md:flex">
-            <Calendar className="w-4 h-4 mr-2" />
-            <SelectValue placeholder="Select Date" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="today">Today</SelectItem>
-            <SelectItem value="7days">Last 7 Days</SelectItem>
-            <SelectItem value="month">This Month</SelectItem>
-            <SelectItem value="custom">Custom Range</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Button asChild size="sm" className="hidden sm:flex">
+            <a href="/admin/sales/new" className="gap-2">
+              <Plus className="w-4 h-4" />
+              New Sale
+            </a>
+          </Button>
+          <Button asChild variant="outline" size="sm" className="hidden md:flex">
+            <a href="/admin/products/new" className="gap-2">
+              <Package className="w-4 h-4" />
+              Add Product
+            </a>
+          </Button>
+          <Button asChild variant="outline" size="sm" className="hidden lg:flex">
+            <a href="/admin/customers/new" className="gap-2">
+              <UsersIcon className="w-4 h-4" />
+              Add Customer
+            </a>
+          </Button>
+          <Button asChild variant="outline" size="sm" className="hidden xl:flex">
+            <a href="/admin/expense/new" className="gap-2">
+              <DollarSign className="w-4 h-4" />
+              Add Expense
+            </a>
+          </Button>
+        </div>
       </div>
 
       {/* Right */}
