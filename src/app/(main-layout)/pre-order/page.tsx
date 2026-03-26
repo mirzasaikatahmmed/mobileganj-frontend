@@ -101,12 +101,12 @@ const steps = [
 
 // ─── Terms & Conditions ───────────────────────────────────
 const terms = [
-  "বুকিং অ্যামাউন্ট: মোট মূল্যের ২০-৩০% অগ্রিম প্রয়োজন",
-  "ডেলিভারি সময়: দুবাই থেকে ৩-৭ কার্যদিবসের মধ্যে",
-  "বাজার পরিবর্তন ও কাস্টমস এর কারণে দাম ±২-৩% পরিবর্তন হতে পারে",
-  "অগ্রিম পেমেন্ট পাওয়ার পর অর্ডার নিশ্চিত হবে",
-  "০% সুদে EMI সুবিধা পাওয়া যাবে",
-  "সম্পূর্ণ ওয়ারেন্টি ও আফটার-সেলস সাপোর্ট নিশ্চিত",
+  "Booking amount: 20-30% advance payment required",
+  "Delivery: 3-7 working days from Dubai",
+  "Price may vary ±2-3% due to customs & market changes",
+  "Order confirmed after advance payment received",
+  "0% interest EMI available",
+  "Full warranty & after-sales support guaranteed",
 ];
 
 export default function PreOrderPage() {
@@ -315,136 +315,24 @@ export default function PreOrderPage() {
       {/* ─── Stats Strip ─── */}
       <section className="border-b border-border/40 bg-muted/20">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            variants={stagger}
-            className="grid grid-cols-2 md:grid-cols-4"
-          >
+          <div className="grid grid-cols-3">
             {[
-              {
-                icon: Globe,
-                value: "দুবাই",
-                label: "সরাসরি আমদানি",
-                color: "text-blue-500",
-              },
-              {
-                icon: Timer,
-                value: "৩-৭",
-                label: "দিনে ডেলিভারি",
-                color: "text-emerald-500",
-              },
-              {
-                icon: Shield,
-                value: "১০০%",
-                label: "অরিজিনাল গ্যারান্টি",
-                color: "text-amber-500",
-              },
-              {
-                icon: Zap,
-                value: "০%",
-                label: "EMI সুদের হার",
-                color: "text-rose-500",
-              },
+              { icon: Globe, value: "Any Phone", label: "From Dubai", color: "text-blue-500" },
+              { icon: Timer, value: "3-7", label: "Days Delivery", color: "text-emerald-500" },
+              { icon: Shield, value: "100%", label: "Original Guarantee", color: "text-amber-500" },
             ].map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                variants={scaleIn}
-                className={`flex flex-col items-center justify-center py-8 sm:py-10 ${
-                  i < 3 ? "border-r border-border/40" : ""
-                }`}
-              >
+              <div key={stat.label}
+                className={`flex flex-col items-center justify-center py-8 ${i < 2 ? "border-r border-border/40" : ""}`}>
                 <stat.icon className={`h-5 w-5 ${stat.color} mb-2`} />
                 <p className="text-2xl sm:text-3xl font-bold">{stat.value}</p>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1 text-center px-2">
-                  {stat.label}
-                </p>
-              </motion.div>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1 text-center px-2">{stat.label}</p>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       <div className="container mx-auto px-4">
-        {/* ─── How It Works ─── */}
-        <section className="py-12 sm:py-16">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            className="text-center mb-10"
-          >
-            <motion.div variants={fadeInUp} custom={0}>
-              <Badge className="mb-3 bg-primary/10 text-primary border-primary/20 hover:bg-primary/15">
-                <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-                কিভাবে কাজ করে?
-              </Badge>
-            </motion.div>
-            <motion.h2
-              variants={fadeInUp}
-              custom={1}
-              className="text-2xl sm:text-3xl font-bold mb-3"
-            >
-              প্রি-অর্ডারের ধাপসমূহ
-            </motion.h2>
-            <motion.p
-              variants={fadeInUp}
-              custom={2}
-              className="text-muted-foreground max-w-lg mx-auto"
-            >
-              মাত্র ৪টি সহজ ধাপে দুবাই থেকে আপনার পছন্দের ফোন পৌঁছে যাবে আপনার
-              হাতে
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            variants={stagger}
-            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4"
-          >
-            {steps.map((step, idx) => (
-              <motion.div
-                key={step.title}
-                variants={scaleIn}
-                className="relative"
-              >
-                <Card
-                  className={`rounded-2xl border-border/60 h-full hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group`}
-                >
-                  <CardContent className="p-5 sm:p-6">
-                    {/* Step number */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div
-                        className={`w-12 h-12 rounded-xl ${step.bg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
-                      >
-                        <step.icon className={`h-6 w-6 ${step.color}`} />
-                      </div>
-                      <span className="text-3xl font-bold text-muted-foreground/20">
-                        {String(idx + 1).padStart(2, "0")}
-                      </span>
-                    </div>
-                    <h3 className="font-bold text-base mb-2">{step.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {step.description}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                {/* Connector arrow (desktop) */}
-                {idx < steps.length - 1 && (
-                  <div className="hidden lg:flex absolute top-1/2 -right-2.5 -translate-y-1/2 z-10">
-                    <div className="w-5 h-5 rounded-full bg-background border border-border/60 flex items-center justify-center">
-                      <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </motion.div>
-        </section>
 
         {/* ─── Terms & Conditions ─── */}
         <section className="pb-12 sm:pb-16">
@@ -461,12 +349,7 @@ export default function PreOrderPage() {
                     <AlertCircle className="h-4 w-4 text-primary" />
                   </div>
                   <div>
-                    <h2 className="font-bold text-lg">
-                      প্রি-অর্ডারের শর্তাবলী
-                    </h2>
-                    <p className="text-xs text-muted-foreground">
-                      অর্ডার করার আগে অনুগ্রহ করে পড়ুন
-                    </p>
+                    <h2 className="font-bold text-lg">প্রি-অর্ডারের শর্তাবলী</h2>
                   </div>
                 </div>
               </div>
@@ -601,54 +484,34 @@ export default function PreOrderPage() {
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
             variants={stagger}
-            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4"
           >
             {[
               {
                 icon: Star,
-                title: "সর্বশেষ মডেল সবার আগে",
-                description:
-                  "বাজারে আসার আগেই সর্বশেষ মডেলগুলো পেয়ে যান। নতুন রিলিজ সবার আগে আপনার হাতে।",
+                title: "Latest Models First",
+                description: "Get the newest models before they hit local stores. Be the first to own the latest release.",
                 color: "text-amber-600",
                 bg: "bg-amber-50 dark:bg-amber-950/30",
               },
               {
-                icon: Banknote,
-                title: "সাশ্রয়ী মূল্য",
-                description:
-                  "দুবাই থেকে সরাসরি আমদানি তাই মধ্যস্বত্ত্বভোগীদের বাড়তি খরচ নেই। সেরা দামে পণ্য পান।",
-                color: "text-emerald-600",
-                bg: "bg-emerald-50 dark:bg-emerald-950/30",
-              },
-              {
                 icon: ShieldCheck,
-                title: "১০০% অরিজিনাল",
-                description:
-                  "প্রতিটি পণ্য সরাসরি অথরাইজড সোর্স থেকে সংগ্রহ করা। অরিজিনালিটির সম্পূর্ণ গ্যারান্টি।",
+                title: "100% Original",
+                description: "Every product sourced directly from authorized channels. Full authenticity guaranteed.",
                 color: "text-blue-600",
                 bg: "bg-blue-50 dark:bg-blue-950/30",
               },
               {
                 icon: CreditCard,
-                title: "সহজ পেমেন্ট",
-                description:
-                  "অল্প অগ্রিম দিয়ে বুকিং করুন, বাকি টাকা পণ্য হাতে পেয়ে দিন। EMI সুবিধাও পাবেন।",
+                title: "Easy Payment",
+                description: "Book with a small advance, pay the rest on delivery. EMI options also available.",
                 color: "text-violet-600",
                 bg: "bg-violet-50 dark:bg-violet-950/30",
               },
               {
-                icon: RotateCcw,
-                title: "ইজি রিটার্ন",
-                description:
-                  "পণ্যে কোনো সমস্যা থাকলে সহজেই রিটার্ন বা এক্সচেঞ্জ করুন। ঝামেলামুক্ত প্রক্রিয়া।",
-                color: "text-orange-600",
-                bg: "bg-orange-50 dark:bg-orange-950/30",
-              },
-              {
                 icon: Truck,
-                title: "দ্রুত ডেলিভারি",
-                description:
-                  "দুবাই থেকে ৩-৭ কার্যদিবসে আপনার দোরগোড়ায়। ট্র্যাকিং সুবিধাসহ নিরাপদ শিপিং।",
+                title: "Fast Delivery",
+                description: "3-7 working days from Dubai to your doorstep. Safe shipping with tracking.",
                 color: "text-pink-600",
                 bg: "bg-pink-50 dark:bg-pink-950/30",
               },

@@ -1,16 +1,10 @@
 import HeroBanner from "./_components/HeroBanner";
 import FeaturedCategories from "./_components/FeaturedCategories";
 import NewArrivalsSection from "./_components/NewArrivalsSection";
-import TrendingSection from "./_components/TrendingSection";
-import BestDealsSection from "./_components/BestDealsSection";
 import BrandNewPhoneSection from "./_components/BrandNewPhoneSection";
 import UsedPhoneSection from "./_components/UsedPhoneSection";
-import SellPhoneCTASection from "./_components/SellPhoneCTASection";
-import EMIBannerSection from "./_components/EMIBannerSection";
 import PreOrderSection from "./_components/PreOrderSection";
-import BrandsSection from "./_components/BrandsSection";
 import TestimonialsSection from "./_components/TestimonialsSection";
-import FeaturesSection from "./_components/FeaturesSection";
 
 const HomePage = () => {
   return (
@@ -22,41 +16,25 @@ const HomePage = () => {
         {/* Categories */}
         <FeaturedCategories />
 
-        {/* New Arrivals (separate section) */}
+        {/* Featured Products — Best Deals + Top Selling tabs */}
         <NewArrivalsSection />
 
-        {/* Brand New Phones (6 cols compact grid) */}
+        {/* Brand New Phones */}
         <BrandNewPhoneSection />
 
-        {/* EMI Banner */}
-        <EMIBannerSection />
-
-        {/* Used Phones (green themed section) */}
+        {/* Pre Owned */}
         <UsedPhoneSection />
-
-        {/* Sell Your Phone CTA */}
-        <SellPhoneCTASection />
-
-        {/* Trending Products */}
-        <TrendingSection />
-
-        {/* Best Deals */}
-        <BestDealsSection />
-
-        {/* Shop by Brand */}
-        <BrandsSection />
       </div>
 
-      {/* Pre-order (full width gradient) */}
+      {/* Pre-order (full width) */}
       <PreOrderSection />
 
-      {/* Customer Testimonials */}
+      {/* Customer Reviews */}
       <div className="container mx-auto px-4">
         <TestimonialsSection />
       </div>
 
       {/* Trust Features Strip */}
-      <FeaturesSection />
     </div>
   );
 };

@@ -2,7 +2,15 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { categories } from '@/lib/mock-data';
+
+const categories = [
+  { name: 'Phone', icon: '📱', href: '/shop?category=Phone' },
+  { name: 'Charger', icon: '🔌', href: '/shop?category=Charger' },
+  { name: 'Earphone', icon: '🎧', href: '/shop?category=Earphone' },
+  { name: 'Power Bank', icon: '🔋', href: '/shop?category=Power Bank' },
+  { name: 'Cover', icon: '📦', href: '/shop?category=Cover' },
+  { name: 'Glass', icon: '🛡️', href: '/shop?category=Glass' },
+];
 
 export default function FeaturedCategories() {
   return (
@@ -13,21 +21,20 @@ export default function FeaturedCategories() {
         </h2>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
         {categories.map((category, idx) => (
           <motion.div
             key={category.name}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
+            transition={{ delay: idx * 0.08 }}
           >
             <Link
-              href={`/shop?category=${category.name}`}
-              className="block p-6 rounded-lg shadow-md bg-card hover:shadow-xl transition-all hover:scale-105"
+              href={category.href}
+              className="flex flex-col items-center gap-3 p-5 rounded-xl bg-card border border-border/60 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300"
             >
-              <div className="text-4xl mb-3 text-center">{category.icon}</div>
-              <h3 className="font-semibold text-center text-sm mb-1">{category.name}</h3>
-              <p className="text-xs text-muted-foreground text-center">{category.count} items</p>
+              <span className="text-3xl">{category.icon}</span>
+              <span className="font-semibold text-sm text-center">{category.name}</span>
             </Link>
           </motion.div>
         ))}
