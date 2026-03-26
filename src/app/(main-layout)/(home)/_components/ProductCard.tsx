@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, Heart, Star, Eye, Zap, Truck } from "lucide-react";
+import { ShoppingCart, Heart, Bookmark, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types/product";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useCartStore } from "@/hooks/use-cart";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -31,32 +31,13 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
     e.preventDefault();
     e.stopPropagation();
     addItem(product);
-    toast.success(`${product.name} কার্টে যোগ হয়েছে`);
+    toast.success(`${product.name} added to cart`);
   };
 
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsWishlisted(!isWishlisted);
-    toast.success(
-      isWishlisted ? "উইশলিস্ট থেকে সরানো হয়েছে" : "উইশলিস্টে যোগ হয়েছে",
-    );
-  };
-
-  // Rating stars
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        className={`h-3 w-3 ${
-          i < Math.floor(rating)
-            ? "fill-amber-400 text-amber-400"
-            : i < rating
-              ? "fill-amber-400/50 text-amber-400"
-              : "fill-muted text-muted-foreground/30"
-        }`}
-      />
-    ));
   };
 
   const isOutOfStock = product.stock === 0 && !product.isPreOrder;
@@ -139,32 +120,23 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             )}
 
             {/* ── Hover Action Buttons ── */}
-            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex flex-col gap-2 opacity-0 translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-              <Button
-                size="icon"
-                variant="secondary"
-                className={`h-8 w-8 rounded-full shadow-md backdrop-blur-sm transition-colors ${
+            <div className="absolute right-2.5 top-2.5 flex flex-col gap-1.5">
+              <button
+                className={`h-8 w-8 rounded-full shadow-md flex items-center justify-center transition-colors ${
                   isWishlisted
-                    ? "bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-950 dark:hover:bg-red-900"
-                    : "bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800"
+                    ? "bg-red-500 text-white"
+                    : "bg-white/90 hover:bg-white dark:bg-gray-800/90 text-foreground"
                 }`}
                 onClick={handleWishlist}
               >
-                <Heart
-                  className={`h-3.5 w-3.5 ${isWishlisted ? "fill-red-500" : ""}`}
-                />
-              </Button>
-              <Button
-                size="icon"
-                variant="secondary"
-                className="h-8 w-8 rounded-full shadow-md bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800 backdrop-blur-sm"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
+                <Heart className={`h-3.5 w-3.5 ${isWishlisted ? "fill-white" : ""}`} />
+              </button>
+              <button
+                className="h-8 w-8 rounded-full shadow-md bg-white/90 hover:bg-white dark:bg-gray-800/90 flex items-center justify-center transition-colors"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
               >
-                <Eye className="h-3.5 w-3.5" />
-              </Button>
+                <Bookmark className="h-3.5 w-3.5" />
+              </button>
             </div>
 
             {/* ── Out of Stock Overlay ── */}
@@ -178,43 +150,22 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           </div>
 
           {/* ── Content Section ── */}
-          <div className="p-3.5 flex flex-col gap-2">
+          <div className="p-3.5 flex flex-col gap-1.5">
             {/* Brand */}
-            <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
               {product.brand}
             </span>
 
             {/* Product Name */}
-            <h3 className="font-semibold text-sm leading-snug line-clamp-2 group-hover:text-primary transition-colors duration-200 min-h-10">
+            <h3 className="font-semibold text-sm leading-snug line-clamp-2 group-hover:text-primary transition-colors duration-200">
               {product.name}
             </h3>
 
-            {/* Rating */}
-            {product.rating && (
-              <div className="flex items-center gap-1.5">
-                <div className="flex items-center gap-0.5">
-                  {renderStars(product.rating)}
-                </div>
-                <span className="text-[11px] font-medium text-foreground/70">
-                  {product.rating}
-                </span>
-                {product.reviewCount && (
-                  <span className="text-[11px] text-muted-foreground">
-                    ({product.reviewCount})
-                  </span>
-                )}
-              </div>
-            )}
-
             {/* Price Section */}
-            <div className="flex flex-col gap-0.5 mt-auto">
+            <div className="flex flex-col gap-0.5 mt-2">
               <div className="flex items-baseline gap-2">
                 <span className="text-lg font-bold text-foreground">
-                  ৳
-                  {(hasOffer
-                    ? product.offerPrice!
-                    : product.price
-                  ).toLocaleString()}
+                  ৳{(hasOffer ? product.offerPrice! : product.price).toLocaleString()}
                 </span>
                 {hasOffer && (
                   <span className="text-xs text-muted-foreground line-through">
@@ -224,54 +175,35 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
               </div>
               {hasOffer && (
                 <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
-                  ৳{savedAmount.toLocaleString()} সেভ করুন
+                  ৳{savedAmount.toLocaleString()} OFF
                 </span>
               )}
             </div>
 
-            {/* Delivery / Stock Info */}
-            <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-              {isLowStock ? (
-                <span className="text-amber-600 dark:text-amber-400 font-medium">
-                  মাত্র {product.stock}টি বাকি!
-                </span>
-              ) : product.deliveryDays ? (
-                <>
-                  <Truck className="h-3 w-3" />
-                  <span>{product.deliveryDays} দিনে ডেলিভারি</span>
-                </>
-              ) : (
-                <>
-                  <Truck className="h-3 w-3" />
-                  <span>দ্রুত ডেলিভারি</span>
-                </>
-              )}
-            </div>
-
-            {/* Add to Cart Button */}
-            <AnimatePresence>
-              <motion.div initial={false} className="pt-1">
-                <Button
-                  className={`w-full py-6 text-base  rounded-lg transition-all duration-200 ${
-                    isOutOfStock
-                      ? "bg-muted text-muted-foreground cursor-not-allowed"
-                      : product.isPreOrder
-                        ? "bg-violet-600 hover:bg-violet-700 text-white"
-                        : "bg-primary hover:bg-primary/90 text-primary-foreground"
-                  }`}
-                  size="sm"
-                  disabled={isOutOfStock}
-                  onClick={handleAddToCart}
-                >
-                  <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
-                  {isOutOfStock
-                    ? "স্টক শেষ"
+            {/* Add to Cart / Shop Now Button */}
+            <div className="pt-2 flex items-center gap-2">
+              <Button
+                className={`flex-1 rounded-lg text-sm font-semibold ${
+                  isOutOfStock
+                    ? "bg-muted text-muted-foreground cursor-not-allowed"
                     : product.isPreOrder
-                      ? "প্রি-অর্ডার করুন"
-                      : "কার্টে যোগ করুন"}
-                </Button>
-              </motion.div>
-            </AnimatePresence>
+                      ? "bg-violet-600 hover:bg-violet-700 text-white"
+                      : ""
+                }`}
+                size="sm"
+                disabled={isOutOfStock}
+                onClick={handleAddToCart}
+              >
+                {isOutOfStock ? "Out of Stock" : product.isPreOrder ? "Pre-Order" : "Shop Now"}
+              </Button>
+              <button
+                onClick={handleAddToCart}
+                disabled={isOutOfStock}
+                className="h-8 w-8 shrink-0 rounded-lg border border-border/60 flex items-center justify-center hover:bg-accent transition-colors disabled:opacity-40"
+              >
+                <ShoppingCart className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         </div>
       </Link>
