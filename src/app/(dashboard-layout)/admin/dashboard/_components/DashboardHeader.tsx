@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, ChevronDown, User, Menu, LogOut, Settings, LayoutDashboard, Plus, ShoppingCart, Package, CreditCard, DollarSign } from 'lucide-react';
+import { Bell, ChevronDown, User, Menu, LogOut, Settings, LayoutDashboard, Plus, ShoppingCart, Package, CreditCard, DollarSign, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 import {
@@ -16,6 +16,12 @@ import { useLogout } from '@/hooks/use-auth';
 interface DashboardHeaderProps {
   onMenuClick: () => void;
 }
+
+const MOCK_DUE_NOTIFICATIONS = [
+  { id: 1, customer: "Rahim Uddin", amount: 5500, date: "15 Apr 2026" },
+  { id: 2, customer: "Karim Hassan", amount: 12000, date: "18 Apr 2026" },
+  { id: 3, customer: "Sojib Mia", amount: 3200, date: "20 Apr 2026" },
+];
 
 export default function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
   const { user } = useAuthStore();
@@ -45,7 +51,7 @@ export default function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
           <Button asChild variant="outline" size="sm" className="hidden lg:flex">
             <a href="/admin/customers/due-collection" className="gap-2">
               <CreditCard className="w-4 h-4" />
-              Due Paid
+              Due Collection
             </a>
           </Button>
           <Button asChild variant="outline" size="sm" className="hidden xl:flex">
@@ -61,10 +67,44 @@ export default function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
       <div className="flex items-center gap-2 md:gap-3">
         <ThemeToggle />
 
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-80">
+            <div className="flex items-center justify-between px-4 py-2 border-b">
+              <p className="text-sm font-semibold">Due Notifications</p>
+              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                {MOCK_DUE_NOTIFICATIONS.length} New
+              </span>
+            </div>
+            <div className="max-h-[300px] overflow-y-auto">
+              {MOCK_DUE_NOTIFICATIONS.map((due) => (
+                <DropdownMenuItem key={due.id} className="flex flex-col items-start gap-1 p-3 cursor-pointer" asChild>
+                  <a href="/admin/customers/due-collection" className="w-full">
+                    <div className="flex items-center justify-between w-full">
+                      <span className="font-medium text-sm">{due.customer}</span>
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {due.date}
+                      </span>
+                    </div>
+                    <p className="text-sm font-bold text-destructive">৳{due.amount.toLocaleString()}</p>
+                  </a>
+                </DropdownMenuItem>
+              ))}
+            </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild className="w-full text-center p-2 justify-center cursor-pointer">
+              <a href="/admin/customers/due-collection" className="text-sm text-primary font-medium w-full flex justify-center">
+                View All Dues
+              </a>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

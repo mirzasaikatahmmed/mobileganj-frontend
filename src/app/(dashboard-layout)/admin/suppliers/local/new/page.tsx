@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 export default function NewLocalSellerPage() {
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-3xl mx-auto">
       <div className="flex items-center gap-4">
         <Link href="/admin/suppliers/local">
           <Button variant="ghost" size="icon">
