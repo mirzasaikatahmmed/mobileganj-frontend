@@ -21,7 +21,7 @@ export default function NewSupplierPage() {
   });
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-3xl mx-auto">
       <div className="flex items-center gap-4">
         <Link href="/admin/suppliers">
           <Button variant="ghost" size="icon">
