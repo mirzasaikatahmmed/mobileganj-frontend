@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  // Allow Next/Image to optimize images loaded from Unsplash hosts.
   images: {
     remotePatterns: [
       {
