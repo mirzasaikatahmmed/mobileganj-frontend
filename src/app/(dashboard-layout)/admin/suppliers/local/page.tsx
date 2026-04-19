@@ -1,15 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Search, Home, Phone, MapPin, Edit, Trash2, UserCheck, Users } from 'lucide-react';
+import { Plus, Search, Phone, MapPin, Edit, Trash2, Users, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 
 const mockSellers = [
-  { id: '1', fullName: 'Karim Ahmed', phone: '01711223344', address: 'Mirpur, Dhaka', nidNumber: '1234567890123', totalPurchase: 450000, status: 'Active' },
-  { id: '2', fullName: 'Rahim Uddin', phone: '01811223344', address: 'Agrabad, Chittagong', nidNumber: '9876543210987', totalPurchase: 325000, status: 'Active' },
+  { id: '1', fullName: 'Karim Ahmed', phone: '01711223344', address: 'Mirpur, Dhaka', nidNumber: '1234567890123', totalPurchase: 450000, due: 25000 },
+  { id: '2', fullName: 'Rahim Uddin', phone: '01811223344', address: 'Agrabad, Chittagong', nidNumber: '9876543210987', totalPurchase: 325000, due: 0 },
 ];
 
 export default function LocalSellersPage() {
@@ -19,6 +18,8 @@ export default function LocalSellersPage() {
     s.fullName.toLowerCase().includes(search.toLowerCase()) || 
     s.phone.includes(search)
   );
+
+  const totalDue = mockSellers.reduce((acc, curr) => acc + curr.due, 0);
 
   return (
     <div className="space-y-6">
@@ -49,12 +50,12 @@ export default function LocalSellersPage() {
         </div>
         <div className="bg-card border rounded-lg p-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
-              <UserCheck className="w-6 h-6 text-blue-500" />
+            <div className="w-12 h-12 rounded-lg bg-orange-500/10 flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-orange-500" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Active Sellers</p>
-              <p className="text-2xl font-bold">{mockSellers.filter(s => s.status === 'Active').length}</p>
+              <p className="text-sm text-muted-foreground">Total Due</p>
+              <p className="text-2xl font-bold">৳{totalDue.toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -78,7 +79,7 @@ export default function LocalSellersPage() {
               <th className="text-left p-4 font-semibold">Contact</th>
               <th className="text-left p-4 font-semibold">NID Number</th>
               <th className="text-left p-4 font-semibold">Total Purchase</th>
-              <th className="text-left p-4 font-semibold">Status</th>
+              <th className="text-left p-4 font-semibold">Due Amount</th>
               <th className="text-right p-4 font-semibold">Actions</th>
             </tr>
           </thead>
@@ -107,9 +108,9 @@ export default function LocalSellersPage() {
                   <p className="font-semibold">৳{seller.totalPurchase.toLocaleString()}</p>
                 </td>
                 <td className="p-4">
-                  <Badge variant={seller.status === 'Active' ? 'default' : 'secondary'}>
-                    {seller.status}
-                  </Badge>
+                  <p className={`font-bold ${seller.due > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                    ৳{seller.due.toLocaleString()}
+                  </p>
                 </td>
                 <td className="p-4">
                   <div className="flex items-center justify-end gap-2">

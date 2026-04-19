@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Plane, Search, Eye } from "lucide-react";
+import { Plus, Plane, Search, Eye, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -168,9 +168,18 @@ export default function OverseasTrackingPage() {
                   </td>
                   <td className="p-4">{phone.lastUpdate}</td>
                   <td className="p-4 text-center">
-                    <Button variant="ghost" size="icon">
-                      <Eye className="w-4 h-4" />
-                    </Button>
+                    <div className="flex items-center justify-center gap-1">
+                      <Link href={`/admin/overseas-tracking/${phone.id}`}>
+                        <Button variant="ghost" size="icon" title="View details">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </Link>
+                      <Link href={`/admin/overseas-tracking/${phone.id}/edit`}>
+                        <Button variant="ghost" size="icon" title="Edit phone entry">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}
