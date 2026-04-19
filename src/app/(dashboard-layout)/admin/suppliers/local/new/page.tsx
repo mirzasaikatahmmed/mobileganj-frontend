@@ -52,6 +52,11 @@ export default function NewLocalSellerPage() {
               <Input placeholder="Mother's name" />
             </div>
           </div>
+
+          <div className="space-y-2">
+            <Label>Reference</Label>
+            <Input placeholder="Enter reference (Optional)" />
+          </div>
         </div>
 
         <div className="bg-card border rounded-lg p-6 space-y-6">
