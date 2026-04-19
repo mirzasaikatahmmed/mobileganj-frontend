@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 
 export default function NewOverseasPhonePage() {
+  const [qty, setQty] = useState(1);
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
@@ -40,13 +43,35 @@ export default function NewOverseasPhonePage() {
               <Label>Storage / Variant</Label>
               <Input placeholder="e.g., 256GB" />
             </div>
-            <div>
-              <Label>IMEI 1 *</Label>
-              <Input placeholder="Enter IMEI 1" required />
+            <div className="col-span-2">
+              <Label>Quantity</Label>
+              <Input 
+                type="number" 
+                min="1" 
+                value={qty} 
+                onChange={(e) => setQty(Math.max(1, parseInt(e.target.value) || 1))} 
+              />
             </div>
-            <div>
-              <Label>IMEI 2</Label>
-              <Input placeholder="Enter IMEI 2" />
+          </div>
+
+          <div className="mt-4 space-y-4 border-t pt-4">
+            <h4 className="font-medium text-sm">IMEI Details</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Array.from({ length: qty }).map((_, index) => (
+                <div key={index} className="p-4 border rounded-md space-y-4 bg-muted/10">
+                  <h5 className="font-medium text-sm text-foreground/80">Device {index + 1}</h5>
+                  <div className="space-y-4">
+                    <div>
+                      <Label>IMEI 1 *</Label>
+                      <Input placeholder={`Device ${index + 1} - IMEI 1`} required />
+                    </div>
+                    <div>
+                      <Label>IMEI 2</Label>
+                      <Input placeholder={`Device ${index + 1} - IMEI 2`} />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -62,13 +87,13 @@ export default function NewOverseasPhonePage() {
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="dubai">Dubai</SelectItem>
+                  <SelectItem value="shop">Shop</SelectItem>
                   <SelectItem value="supplier">Supplier</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Source Person / Supplier *</Label>
+              <Label>Supplier / Shop *</Label>
               <Input placeholder="Enter name" required />
             </div>
             <div>
@@ -138,8 +163,9 @@ export default function NewOverseasPhonePage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="purchased">Purchased</SelectItem>
-                  <SelectItem value="sent">Sent to Carrier</SelectItem>
-                  <SelectItem value="with-carrier">With Carrier</SelectItem>
+                  <SelectItem value="sent_to_carrier">Sent to Carrier</SelectItem>
+                  <SelectItem value="received">Received</SelectItem>
+                  <SelectItem value="return">Return</SelectItem>
                 </SelectContent>
               </Select>
             </div>

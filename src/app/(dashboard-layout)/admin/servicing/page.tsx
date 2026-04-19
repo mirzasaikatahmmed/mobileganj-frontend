@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Wrench, Eye, Search } from "lucide-react";
+import { Plus, Wrench, Eye, Search, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -163,11 +163,18 @@ export default function ServicingPage() {
                     </span>
                   </td>
                   <td className="p-4 text-center">
-                    <Link href={`/admin/servicing/${job.id}`}>
-                      <Button variant="ghost" size="icon">
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                    </Link>
+                    <div className="flex items-center justify-center gap-1">
+                      <Link href={`/admin/servicing/${job.id}`}>
+                        <Button variant="ghost" size="icon" title="View">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </Link>
+                      <Link href={`/admin/servicing/${job.id}/edit`}>
+                        <Button variant="ghost" size="icon" title="Edit">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}
