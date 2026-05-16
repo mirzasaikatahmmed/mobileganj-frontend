@@ -73,35 +73,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             {/* Gradient overlay on hover */}
             <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-            {/* ── Top Left Badges ── */}
-            <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
-              {hasOffer && (
-                <Badge className="bg-red-500 hover:bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 shadow-sm">
-                  -{discount}%
-                </Badge>
-              )}
-              {product.tags?.includes("New Arrival") && (
-                <Badge className="bg-blue-500 hover:bg-blue-500 text-white text-[10px] font-medium px-2 py-0.5 shadow-sm">
-                  নতুন
-                </Badge>
-              )}
-              {product.tags?.includes("Hot") && (
-                <Badge className="bg-orange-500 hover:bg-orange-500 text-white text-[10px] font-medium px-2 py-0.5 shadow-sm">
-                  <Zap className="h-2.5 w-2.5 mr-0.5 fill-current" />
-                  হট
-                </Badge>
-              )}
-              {product.tags?.includes("Best Deal") && (
-                <Badge className="bg-emerald-500 hover:bg-emerald-500 text-white text-[10px] font-medium px-2 py-0.5 shadow-sm">
-                  বেস্ট ডিল
-                </Badge>
-              )}
-              {product.isPreOrder && (
-                <Badge className="bg-violet-500 hover:bg-violet-500 text-white text-[10px] font-medium px-2 py-0.5 shadow-sm">
-                  প্রি-অর্ডার
-                </Badge>
-              )}
-            </div>
+
 
             {/* ── Condition Badge (Top Right) ── */}
             {product.condition !== "Brand New" && (
@@ -114,7 +86,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                       : "bg-teal-500/90 text-white border-teal-500"
                   }`}
                 >
-                  {product.condition === "Used" ? "ইউজড" : "লাইক নিউ"}
+                  {product.condition === "Used" ? "Used" : "Like New"}
                 </Badge>
               </div>
             )}
@@ -128,12 +100,16 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                     : "bg-white/90 hover:bg-white dark:bg-gray-800/90 text-foreground"
                 }`}
                 onClick={handleWishlist}
+                title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
               >
                 <Heart className={`h-3.5 w-3.5 ${isWishlisted ? "fill-white" : ""}`} />
               </button>
               <button
                 className="h-8 w-8 rounded-full shadow-md bg-white/90 hover:bg-white dark:bg-gray-800/90 flex items-center justify-center transition-colors"
                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                title="Save for later"
+                aria-label="Save for later"
               >
                 <Bookmark className="h-3.5 w-3.5" />
               </button>
@@ -143,7 +119,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             {isOutOfStock && (
               <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center">
                 <span className="bg-red-500 text-white text-xs font-bold px-4 py-1.5 rounded-full">
-                  স্টক শেষ
+                  Out of Stock
                 </span>
               </div>
             )}

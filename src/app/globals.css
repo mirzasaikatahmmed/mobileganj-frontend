@@ -91,38 +91,38 @@
 }
 
 .dark {
-  /* ── Apple Gadgets BD Theme — Dark Mode (Black base like header/footer) ── */
-  --background: #0a0a0a;                    /* Near-black page bg */
-  --foreground: #f9fafb;                    /* gray-50 — bright text */
+  /* ── Modern Professional Dark Theme (Slate / Blue-Grey) ── */
+  --background: #0f172a;                    /* slate-900 — Deep blue-grey bg */
+  --foreground: #f8fafc;                    /* slate-50 — bright text */
 
   /* Cards */
-  --card: #111111;                          /* Slightly lifted black */
-  --card-foreground: #f9fafb;
-  --popover: #1a1a1a;                       /* Elevated dropdown */
-  --popover-foreground: #f9fafb;
+  --card: #1e293b;                          /* slate-800 — Elevated card */
+  --card-foreground: #f8fafc;
+  --popover: #1e293b;                       /* Elevated dropdown */
+  --popover-foreground: #f8fafc;
 
   /* Primary — Orange stays consistent */
   --primary: #f97316;
   --primary-foreground: #ffffff;
 
-  /* Secondary — Dark gray surface */
-  --secondary: #1f2937;                     /* gray-800 */
-  --secondary-foreground: #f3f4f6;          /* gray-100 */
+  /* Secondary — Lighter surface */
+  --secondary: #334155;                     /* slate-700 */
+  --secondary-foreground: #f8fafc;
 
   /* Muted */
-  --muted: #111827;                         /* gray-900 */
-  --muted-foreground: #9ca3af;              /* gray-400 */
+  --muted: #1e293b;                         /* slate-800 */
+  --muted-foreground: #94a3b8;              /* slate-400 */
 
-  /* Accent — Orange-tinted hover */
-  --accent: #1c1008;                        /* Very dark orange tint */
-  --accent-foreground: #fb923c;             /* orange-400 */
+  /* Accent — Hover tint */
+  --accent: #334155;                        /* slate-700 */
+  --accent-foreground: #f8fafc;             /* slate-50 */
 
   /* Destructive */
   --destructive: #ef4444;                   /* red-500 */
 
   /* Borders & Inputs */
-  --border: #374151;                        /* gray-700 */
-  --input: #374151;
+  --border: #334155;                        /* slate-700 */
+  --input: #334155;
   --ring: #f97316;                          /* Orange — focus ring */
 
   /* Charts */
@@ -132,14 +132,14 @@
   --chart-4: #c084fc;                       /* Purple-400 */
   --chart-5: #f87171;                       /* Red-400 */
 
-  /* Sidebar — Pure black like site's header/footer */
-  --sidebar: #000000;
-  --sidebar-foreground: #f3f4f6;
+  /* Sidebar */
+  --sidebar: #0f172a;                       /* slate-900 */
+  --sidebar-foreground: #f8fafc;
   --sidebar-primary: #f97316;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1a1a1a;
-  --sidebar-accent-foreground: #f9fafb;
-  --sidebar-border: #374151;
+  --sidebar-accent: #1e293b;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: #334155;
   --sidebar-ring: #f97316;
 }
 

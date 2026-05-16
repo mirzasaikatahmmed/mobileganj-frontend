@@ -30,7 +30,7 @@ const policyLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-[#1a1a1a] text-gray-300 mt-16">
+    <footer className="bg-card text-muted-foreground border-t mt-16">
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
