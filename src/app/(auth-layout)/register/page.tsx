@@ -17,15 +17,15 @@ export default function RegisterPage() {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!form.name.trim()) e.name = "নাম দিন";
-    if (!form.phone || !/^01[3-9]\d{8}$/.test(form.phone)) e.phone = "সঠিক ফোন নম্বর দিন";
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "সঠিক ইমেইল দিন";
-    if (!form.password || form.password.length < 6) e.password = "পাসওয়ার্ড কমপক্ষে ৬ অক্ষর";
-    if (form.password !== form.confirmPassword) e.confirmPassword = "পাসওয়ার্ড মিলছে না";
+    if (!form.name.trim()) e.name = "Full name is required";
+    if (!form.phone || !/^01[3-9]\d{8}$/.test(form.phone)) e.phone = "Enter a valid phone number";
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Enter a valid email address";
+    if (!form.password || form.password.length < 6) e.password = "Password must be at least 6 characters";
+    if (form.password !== form.confirmPassword) e.confirmPassword = "Passwords do not match";
     setErrors(e);
     return !Object.keys(e).length;
   };
-
+ 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
@@ -33,7 +33,7 @@ export default function RegisterPage() {
       register.mutate(payload);
     }
   };
-
+ 
   const passwordStrength = () => {
     const p = form.password;
     if (!p) return 0;
@@ -45,11 +45,11 @@ export default function RegisterPage() {
     if (/[^A-Za-z0-9]/.test(p)) s++;
     return s;
   };
-
+ 
   const strength = passwordStrength();
   const strengthColor = strength <= 2 ? "bg-red-500" : strength <= 3 ? "bg-yellow-500" : "bg-green-500";
-  const strengthText = strength <= 2 ? "দুর্বল" : strength <= 3 ? "মাঝারি" : "শক্তিশালী";
-
+  const strengthText = strength <= 2 ? "Weak" : strength <= 3 ? "Medium" : "Strong";
+ 
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -58,23 +58,23 @@ export default function RegisterPage() {
       className="space-y-6"
     >
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">নতুন অ্যাকাউন্ট</h1>
-        <p className="mt-1 text-sm text-muted-foreground">MobileGanj-এ যোগ দিন</p>
+        <h1 className="text-2xl font-bold tracking-tight">Create Account</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Join MobileGanj today</p>
       </div>
-
+ 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="name">পুরো নাম *</Label>
+          <Label htmlFor="name">Full Name *</Label>
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="name" placeholder="আপনার নাম" className="pl-10 h-11"
+            <Input id="name" placeholder="Your full name" className="pl-10 h-11"
               value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </div>
           {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
         </div>
-
+ 
         <div className="space-y-2">
-          <Label htmlFor="phone">ফোন নম্বর *</Label>
+          <Label htmlFor="phone">Phone Number *</Label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input id="phone" type="tel" placeholder="01XXXXXXXXX" className="pl-10 h-11"
@@ -82,9 +82,9 @@ export default function RegisterPage() {
           </div>
           {errors.phone && <p className="text-xs text-destructive">{errors.phone}</p>}
         </div>
-
+ 
         <div className="space-y-2">
-          <Label htmlFor="email">ইমেইল <span className="text-muted-foreground font-normal">(ঐচ্ছিক)</span></Label>
+          <Label htmlFor="email">Email <span className="text-muted-foreground font-normal">(Optional)</span></Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input id="email" type="email" placeholder="email@example.com" className="pl-10 h-11"
@@ -92,12 +92,12 @@ export default function RegisterPage() {
           </div>
           {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
         </div>
-
+ 
         <div className="space-y-2">
-          <Label htmlFor="password">পাসওয়ার্ড *</Label>
+          <Label htmlFor="password">Password *</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="password" type={showPassword ? "text" : "password"} placeholder="কমপক্ষে ৬ অক্ষর"
+            <Input id="password" type={showPassword ? "text" : "password"} placeholder="At least 6 characters"
               className="pl-10 pr-10 h-11" value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })} />
             <button type="button" onClick={() => setShowPassword(!showPassword)}
@@ -112,40 +112,40 @@ export default function RegisterPage() {
                   <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= strength ? strengthColor : "bg-muted"}`} />
                 ))}
               </div>
-              <p className="text-xs text-muted-foreground">শক্তি: {strengthText}</p>
+              <p className="text-xs text-muted-foreground">Strength: {strengthText}</p>
             </div>
           )}
           {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
         </div>
-
+ 
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword">পাসওয়ার্ড নিশ্চিত করুন *</Label>
+          <Label htmlFor="confirmPassword">Confirm Password *</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="confirmPassword" type="password" placeholder="পাসওয়ার্ড আবার লিখুন"
+            <Input id="confirmPassword" type="password" placeholder="Confirm your password"
               className="pl-10 h-11" value={form.confirmPassword}
               onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} />
           </div>
           {form.confirmPassword && form.password === form.confirmPassword && (
             <p className="text-xs text-green-600 flex items-center gap-1">
-              <CheckCircle2 className="h-3 w-3" /> পাসওয়ার্ড মিলেছে
+              <CheckCircle2 className="h-3 w-3" /> Passwords match
             </p>
           )}
           {errors.confirmPassword && <p className="text-xs text-destructive">{errors.confirmPassword}</p>}
         </div>
-
+ 
         <Button type="submit" className="w-full h-11" disabled={register.isPending}>
           {register.isPending ? (
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
           ) : (
-            <>অ্যাকাউন্ট তৈরি করুন <ArrowRight className="h-4 w-4 ml-1" /></>
+            <>Create Account <ArrowRight className="h-4 w-4 ml-1" /></>
           )}
         </Button>
       </form>
-
+ 
       <p className="text-center text-sm text-muted-foreground">
-        ইতোমধ্যে অ্যাকাউন্ট আছে?{" "}
-        <Link href="/login" className="font-medium text-primary hover:underline">লগইন করুন</Link>
+        Already have an account?{" "}
+        <Link href="/login" className="font-medium text-primary hover:underline">Login</Link>
       </p>
     </motion.div>
   );
