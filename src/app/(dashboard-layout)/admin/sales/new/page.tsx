@@ -93,48 +93,51 @@ export default function NewSalePage() {
   useEffect(() => { setSaleDateTime(getNow()); }, []);
 
   return (
-    <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/sales">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">New Sale</h1>
-            <p className="text-muted-foreground text-sm sm:text-base">Create new invoice</p>
+    <div className="space-y-4 px-0 sm:px-0">
+      {/* ─── Compact Sticky Header ─── */}
+      <div className="card-base p-2 sticky top-0 z-30 bg-background/95 backdrop-blur border-x-0 sm:border-x">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+          {/* Left: Back & Title */}
+          <div className="flex items-center justify-between lg:justify-start gap-2 shrink-0">
+            <div className="flex items-center gap-1">
+              <Link href="/admin/sales">
+                <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-accent shrink-0 -ml-1">
+                  <ArrowLeft className="w-4 h-4" />
+                </Button>
+              </Link>
+              <h1 className="text-base sm:text-lg font-bold leading-none py-1 mb-0 whitespace-nowrap">New Sale</h1>
+            </div>
+
+            {/* Invoice Info (Mobile Only - will be hidden on desktop as it moves to the end) */}
+            <div className="lg:hidden bg-primary/5 border border-primary/10 px-2 py-1 rounded-md flex flex-col justify-center items-end shrink-0">
+              <p className="text-[8px] text-primary/70 uppercase font-bold tracking-tighter leading-none">Invoice</p>
+              <p className="text-[11px] font-mono font-bold leading-none mt-1 text-primary">INV-982612</p>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs sm:text-sm text-muted-foreground">Invoice No:</span>
-          <span className="font-mono font-bold text-sm sm:text-base">INV-{Date.now().toString().slice(-6)}</span>
-        </div>
-      </div>
 
-      {/* Customer Search */}
-      <CustomerSearch />
+          {/* Middle: Customer Search (Embedded) */}
+          <div className="flex-1 w-full">
+            <CustomerSearch minimal />
+          </div>
 
-      {/* Sale Date & Time */}
-      <div className="card-base p-4">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-          <label className="text-sm font-medium shrink-0">Sale Date &amp; Time</label>
-          <div className="flex gap-2 flex-1">
-            <input
-              type="datetime-local"
-              value={saleDateTime}
-              onChange={(e) => setSaleDateTime(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1"
-            />
-            <button
-              type="button"
-              title="Reset to now"
-              onClick={() => setSaleDateTime(getNow())}
-              className="inline-flex items-center justify-center h-10 w-10 rounded-md border border-input bg-background hover:bg-accent text-muted-foreground hover:text-foreground transition-colors shrink-0"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-            </button>
+          {/* Right: Date Picker & Invoice No (Desktop) */}
+          <div className="flex items-center gap-2 w-full lg:w-auto">
+            {/* Date Picker */}
+            <div className="flex-1 lg:flex-none flex items-center gap-2 bg-muted/30 px-2 py-1 rounded-md border border-border/50 h-9 shrink-0">
+              <span className="text-[10px] font-bold uppercase text-muted-foreground">Date</span>
+              <input
+                type="datetime-local"
+                value={saleDateTime}
+                onChange={(e) => setSaleDateTime(e.target.value)}
+                className="bg-transparent border-none text-[11px] font-medium focus:ring-0 flex-1 lg:w-[165px]"
+              />
+            </div>
+
+            {/* Invoice Info (Desktop Only) */}
+            <div className="hidden lg:flex bg-primary/5 border border-primary/10 px-3 py-1 rounded-md h-9 flex-col justify-center shrink-0">
+              <p className="text-[9px] text-primary/70 uppercase font-bold tracking-tighter leading-none">Invoice No</p>
+              <p className="text-xs font-mono font-bold leading-none mt-1 text-primary">INV-982612</p>
+            </div>
           </div>
         </div>
       </div>

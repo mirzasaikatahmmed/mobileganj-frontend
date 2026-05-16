@@ -16,19 +16,19 @@ interface FilterSidebarProps {
 }
 
 const categoryLabels: Record<string, string> = {
-  Phone: "ফোন",
-  Accessories: "এক্সেসরিজ",
-  Charger: "চার্জার",
-  Earphone: "ইয়ারফোন",
-  "Power Bank": "পাওয়ার ব্যাংক",
-  Cover: "কভার",
-  Glass: "গ্লাস প্রটেক্টর",
+  Phone: "Phone",
+  Accessories: "Accessories",
+  Charger: "Charger",
+  Earphone: "Earphone",
+  "Power Bank": "Power Bank",
+  Cover: "Cover",
+  Glass: "Glass Protector",
 };
 
 const conditionLabels: Record<string, string> = {
-  "Brand New": "নতুন",
-  Used: "ব্যবহৃত",
-  "Like New": "নতুনের মতো",
+  "Brand New": "Brand New",
+  Used: "Used",
+  "Like New": "Like New",
 };
 
 export default function FilterSidebar({
@@ -90,7 +90,7 @@ export default function FilterSidebar({
     <div className="space-y-5 p-4">
       {isMobile && (
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold">ফিল্টার</h2>
+          <h2 className="text-lg font-bold">Filters</h2>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
           </Button>
@@ -105,7 +105,7 @@ export default function FilterSidebar({
         onClick={clearFilters}
       >
         <RotateCcw className="h-3.5 w-3.5" />
-        সব ফিল্টার মুছুন
+        Clear All Filters
         {activeFilterCount > 0 && (
           <span className="ml-auto bg-primary/10 text-primary text-xs font-semibold px-1.5 py-0.5 rounded-full">
             {activeFilterCount}
@@ -117,7 +117,7 @@ export default function FilterSidebar({
 
       {/* Brand Filter */}
       <div>
-        <h3 className="font-semibold text-sm mb-3">ব্র্যান্ড</h3>
+        <h3 className="font-semibold text-sm mb-3">Brand</h3>
         <div className="space-y-2">
           {brands.map((brand) => (
             <div key={brand} className="flex items-center space-x-2">
@@ -141,7 +141,7 @@ export default function FilterSidebar({
 
       {/* Category Filter */}
       <div>
-        <h3 className="font-semibold text-sm mb-3">ক্যাটাগরি</h3>
+        <h3 className="font-semibold text-sm mb-3">Category</h3>
         <div className="space-y-2">
           {categories.map((category) => (
             <div key={category} className="flex items-center space-x-2">
@@ -165,7 +165,7 @@ export default function FilterSidebar({
 
       {/* Price Range */}
       <div>
-        <h3 className="font-semibold text-sm mb-3">মূল্য পরিসীমা</h3>
+        <h3 className="font-semibold text-sm mb-3">Price Range</h3>
         <div className="px-1">
           <Slider
             value={priceRange}
@@ -176,10 +176,10 @@ export default function FilterSidebar({
           />
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span className="bg-muted px-2 py-1 rounded-md">
-              ৳{priceRange[0].toLocaleString("bn-BD")}
+              ৳{priceRange[0].toLocaleString()}
             </span>
             <span className="bg-muted px-2 py-1 rounded-md">
-              ৳{priceRange[1].toLocaleString("bn-BD")}
+              ৳{priceRange[1].toLocaleString()}
             </span>
           </div>
         </div>
@@ -189,7 +189,7 @@ export default function FilterSidebar({
 
       {/* Condition Filter */}
       <div>
-        <h3 className="font-semibold text-sm mb-3">কন্ডিশন</h3>
+        <h3 className="font-semibold text-sm mb-3">Condition</h3>
         <div className="space-y-2">
           {conditions.map((condition) => (
             <div key={condition} className="flex items-center space-x-2">

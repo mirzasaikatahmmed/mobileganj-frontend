@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { motion } from "framer-motion";
-import { Calculator, CreditCard } from "lucide-react";
+import { Calculator } from "lucide-react";
 
 interface EMICalculatorProps {
   productPrice: number;
@@ -24,7 +24,7 @@ export default function EMICalculator({ productPrice }: EMICalculatorProps) {
     <div className="space-y-6">
       <div className="flex items-center gap-2 mb-2">
         <Calculator className="h-5 w-5 text-primary" />
-        <h3 className="text-lg font-bold">EMI ক্যালকুলেটর</h3>
+        <h3 className="text-lg font-bold">EMI Calculator</h3>
       </div>
 
       <div className="rounded-xl border border-border/60 bg-card p-5 md:p-6 space-y-6">
@@ -32,11 +32,9 @@ export default function EMICalculator({ productPrice }: EMICalculatorProps) {
         <div>
           <div className="flex items-center justify-between mb-3">
             <label className="text-sm font-medium">
-              ডাউন পেমেন্ট ({downPaymentPercent}%)
+              Down Payment ({downPaymentPercent}%)
             </label>
-            <span className="text-sm font-bold">
-              ৳{downPayment.toLocaleString()}
-            </span>
+            <span className="text-sm font-bold">৳{downPayment.toLocaleString()}</span>
           </div>
           <Slider
             value={[downPaymentPercent]}
@@ -46,16 +44,14 @@ export default function EMICalculator({ productPrice }: EMICalculatorProps) {
             step={5}
           />
           <div className="flex justify-between text-xs text-muted-foreground mt-2">
-            <span>১০%</span>
-            <span>৬০%</span>
+            <span>10%</span>
+            <span>60%</span>
           </div>
         </div>
 
         {/* Duration Buttons */}
         <div>
-          <label className="text-sm font-medium mb-3 block">
-            কিস্তির মেয়াদ
-          </label>
+          <label className="text-sm font-medium mb-3 block">Installment Duration</label>
           <div className="grid grid-cols-4 gap-2">
             {([3, 6, 9, 12] as const).map((d) => (
               <button
@@ -67,7 +63,7 @@ export default function EMICalculator({ productPrice }: EMICalculatorProps) {
                     : "border-border hover:border-primary/40 text-muted-foreground"
                 }`}
               >
-                {d} মাস
+                {d} months
               </button>
             ))}
           </div>
@@ -78,26 +74,21 @@ export default function EMICalculator({ productPrice }: EMICalculatorProps) {
         {/* Results */}
         <div className="space-y-3">
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">প্রোডাক্ট প্রাইস</span>
-            <span className="font-medium">
-              ৳{productPrice.toLocaleString()}
-            </span>
+            <span className="text-muted-foreground">Product Price</span>
+            <span className="font-medium">৳{productPrice.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">ডাউন পেমেন্ট</span>
+            <span className="text-muted-foreground">Down Payment</span>
             <span className="font-medium">৳{downPayment.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">ঋণের পরিমাণ</span>
+            <span className="text-muted-foreground">Loan Amount</span>
             <span className="font-medium">৳{loanAmount.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">সুদের হার</span>
-            <Badge
-              variant="outline"
-              className="text-emerald-600 border-emerald-300 bg-emerald-50 dark:bg-emerald-950 dark:border-emerald-800 text-xs"
-            >
-              ০%
+            <span className="text-muted-foreground">Interest Rate</span>
+            <Badge variant="outline" className="text-emerald-600 border-emerald-300 bg-emerald-50 dark:bg-emerald-950 dark:border-emerald-800 text-xs">
+              0%
             </Badge>
           </div>
 
@@ -105,7 +96,7 @@ export default function EMICalculator({ productPrice }: EMICalculatorProps) {
 
           {/* Monthly EMI Highlight */}
           <div className="text-center py-3 rounded-xl bg-primary/5 border border-primary/15">
-            <p className="text-xs text-muted-foreground mb-1">মাসিক কিস্তি</p>
+            <p className="text-xs text-muted-foreground mb-1">Monthly Installment</p>
             <motion.div
               key={`${downPaymentPercent}-${duration}`}
               initial={{ scale: 0.9, opacity: 0 }}
@@ -115,22 +106,20 @@ export default function EMICalculator({ productPrice }: EMICalculatorProps) {
               <span className="text-3xl font-bold text-primary">
                 ৳{monthlyInstallment.toLocaleString()}
               </span>
-              <span className="text-sm text-muted-foreground">/মাস</span>
+              <span className="text-sm text-muted-foreground">/month</span>
             </motion.div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {duration} মাসের জন্য
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">for {duration} months</p>
           </div>
 
           <div className="flex justify-between text-sm pt-1">
-            <span className="font-medium">মোট পরিশোধযোগ্য</span>
+            <span className="font-medium">Total Payable</span>
             <span className="font-bold">৳{totalPayable.toLocaleString()}</span>
           </div>
         </div>
       </div>
 
       <p className="text-xs text-muted-foreground text-center">
-        * EMI সুবিধা অনুমোদন সাপেক্ষে। শর্তাবলী প্রযোজ্য।
+        * EMI facility subject to approval. Terms and conditions apply.
       </p>
     </div>
   );

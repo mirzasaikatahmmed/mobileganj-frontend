@@ -140,6 +140,43 @@ export default function InvoicePage() {
             </div>
           </div>
 
+          {/* ─── Warranty & Terms Section ─── */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 border rounded-xl bg-card/30">
+            {/* Warranty Column */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-1.5 bg-primary/10 rounded-lg text-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                </div>
+                <h4 className="font-bold text-sm uppercase tracking-wider">Warranty Policy</h4>
+              </div>
+              <ul className="space-y-2 text-[11px] text-muted-foreground list-disc pl-4 leading-relaxed">
+                <li>Warranty is applicable as per company rules and regulations.</li>
+                <li>Warranty will be effective based on the IMEI number provided at the time of purchase.</li>
+                <li>Warranty is only applicable for hardware manufacturing defects.</li>
+                <li>Software-related issues and OS modifications are not covered under warranty.</li>
+                <li>No services will be provided after the warranty period expires.</li>
+              </ul>
+            </div>
+
+            {/* Terms Column */}
+            <div className="md:border-l md:pl-6">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-1.5 bg-primary/10 rounded-lg text-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <h4 className="font-bold text-sm uppercase tracking-wider">Terms & Conditions</h4>
+              </div>
+              <ul className="space-y-2 text-[11px] text-muted-foreground list-disc pl-4 leading-relaxed">
+                <li>Any physical damage (broken, water damage, etc.) will void the warranty.</li>
+                <li>Warranty will be void if the device is serviced by an unauthorized person.</li>
+                <li>Product exchange or return is only acceptable within the specified time limit.</li>
+                <li>All complaints will be accepted only upon presentation of the original bill.</li>
+                <li>The company's decision will be considered final in all matters.</li>
+              </ul>
+            </div>
+          </div>
+
           <div className="pt-8 border-t text-center text-sm text-muted-foreground">
             <p className="mb-2">Thank you for your business!</p>
             <p>For any queries, contact us at info@mobileganj.com</p>
