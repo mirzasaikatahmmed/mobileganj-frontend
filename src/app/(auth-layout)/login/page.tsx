@@ -17,17 +17,17 @@ export default function LoginPage() {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!form.email) e.email = "ইমেইল দিন";
-    if (!form.password || form.password.length < 6) e.password = "পাসওয়ার্ড কমপক্ষে ৬ অক্ষর";
+    if (!form.email) e.email = "Email is required";
+    if (!form.password || form.password.length < 6) e.password = "Password must be at least 6 characters";
     setErrors(e);
     return !Object.keys(e).length;
   };
-
+ 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) login.mutate(form);
   };
-
+ 
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -36,15 +36,15 @@ export default function LoginPage() {
       className="space-y-6"
     >
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">লগইন করুন</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Login</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          আপনার অ্যাকাউন্টে প্রবেশ করুন
+          Sign in to your account
         </p>
       </div>
-
+ 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email">ইমেইল</Label>
+          <Label htmlFor="email">Email</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -58,12 +58,12 @@ export default function LoginPage() {
           </div>
           {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
         </div>
-
+ 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="password">পাসওয়ার্ড</Label>
+            <Label htmlFor="password">Password</Label>
             <Link href="#" className="text-xs text-primary hover:underline">
-              পাসওয়ার্ড ভুলে গেছেন?
+              Forgot password?
             </Link>
           </div>
           <div className="relative">
@@ -86,7 +86,7 @@ export default function LoginPage() {
           </div>
           {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
         </div>
-
+ 
         <Button
           type="submit"
           className="w-full h-11"
@@ -95,15 +95,15 @@ export default function LoginPage() {
           {login.isPending ? (
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
           ) : (
-            <>লগইন করুন <ArrowRight className="h-4 w-4 ml-1" /></>
+            <>Login <ArrowRight className="h-4 w-4 ml-1" /></>
           )}
         </Button>
       </form>
-
+ 
       <p className="text-center text-sm text-muted-foreground">
-        অ্যাকাউন্ট নেই?{" "}
+        Don&apos;t have an account?{" "}
         <Link href="/register" className="font-medium text-primary hover:underline">
-          রেজিস্টার করুন
+          Register
         </Link>
       </p>
     </motion.div>
