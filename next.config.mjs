@@ -2,6 +2,7 @@
 const nextConfig = {
   // Allow Next/Image to optimize images loaded from Unsplash hosts.
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
