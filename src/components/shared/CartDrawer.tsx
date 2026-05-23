@@ -54,7 +54,7 @@ export default function CartDrawer() {
           <div className="flex items-center justify-between px-5 py-4 border-b shrink-0">
             <div className="flex items-center gap-2">
               <ShoppingCart className="h-5 w-5 text-primary" />
-              <h2 className="font-bold text-lg">শপিং কার্ট</h2>
+              <h2 className="font-bold text-lg">Shopping Cart</h2>
               {totalItems > 0 && (
                 <span className="text-xs bg-primary text-primary-foreground rounded-full px-2 py-0.5 font-semibold">
                   {totalItems}
@@ -77,11 +77,11 @@ export default function CartDrawer() {
                   <ShoppingCart className="h-10 w-10 text-primary/40" />
                 </div>
                 <div>
-                  <p className="font-semibold text-lg">কার্ট খালি!</p>
-                  <p className="text-sm text-muted-foreground mt-1">পণ্য যোগ করুন</p>
+                  <p className="font-semibold text-lg">Cart is empty!</p>
+                  <p className="text-sm text-muted-foreground mt-1">Add some products</p>
                 </div>
                 <Button onClick={() => router.back()} variant="outline" className="rounded-full">
-                  শপিং করুন
+                  Continue Shopping
                 </Button>
               </div>
             ) : (
@@ -155,20 +155,20 @@ export default function CartDrawer() {
               {totalPrice < 5000 && (
                 <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
                   <Truck className="h-3.5 w-3.5 shrink-0" />
-                  <span>আরো ৳{(5000 - totalPrice).toLocaleString("bn-BD")} অর্ডারে ফ্রি ডেলিভারি</span>
+                  <span>Add ৳{(5000 - totalPrice).toLocaleString()} more for free delivery</span>
                 </div>
               )}
 
               {/* Totals */}
               <div className="space-y-1.5 text-sm">
                 <div className="flex justify-between text-muted-foreground">
-                  <span>ডেলিভারি</span>
+                  <span>Delivery</span>
                   <span className={deliveryCharge === 0 ? "text-emerald-500" : ""}>
-                    {deliveryCharge === 0 ? "ফ্রি" : `৳${deliveryCharge}`}
+                    {deliveryCharge === 0 ? "Free" : `৳${deliveryCharge}`}
                   </span>
                 </div>
                 <div className="flex justify-between font-bold text-base">
-                  <span>সর্বমোট</span>
+                  <span>Grand Total</span>
                   <span className="text-primary">৳{grandTotal.toLocaleString("bn-BD")}</span>
                 </div>
               </div>
@@ -176,10 +176,10 @@ export default function CartDrawer() {
               {/* Actions */}
               <div className="grid grid-cols-2 gap-2">
                 <Button variant="outline" className="w-full rounded-xl text-sm" onClick={() => { window.location.href = "/cart"; }}>
-                  কার্ট দেখুন
+                  View Cart
                 </Button>
                 <Button className="w-full rounded-xl gap-1.5 text-sm font-semibold" onClick={() => { window.location.href = "/checkout"; }}>
-                  চেকআউট
+                  Checkout
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>

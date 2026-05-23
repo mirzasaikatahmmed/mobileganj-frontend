@@ -9,7 +9,7 @@ const testimonials = [
     name: "Karim Ahmed",
     location: "Rangpur",
     rating: 5,
-    text: "iPhone 15 Pro Max কিনলাম Mobile GANJ থেকে। ১০০% অরিজিনাল প্রোডাক্ট পেয়েছি। EMI সুবিধাও দারুণ!",
+    text: "Bought iPhone 15 Pro Max from Mobile GANJ. Got 100% original product. EMI facility is great!",
     product: "iPhone 15 Pro Max",
     avatar: "👨",
   },
@@ -18,7 +18,7 @@ const testimonials = [
     name: "Fatima Akter",
     location: "Dhaka",
     rating: 5,
-    text: "Pre-order করেছিলাম Dubai থেকে Samsung S24 Ultra। ৫ দিনের মধ্যে পেয়ে গেছি। Excellent service!",
+    text: "Pre-ordered Samsung S24 Ultra from Dubai. Received within 5 days. Excellent service!",
     product: "Samsung S24 Ultra",
     avatar: "👩",
   },
@@ -27,7 +27,7 @@ const testimonials = [
     name: "Rahim Khan",
     location: "Bogura",
     rating: 5,
-    text: "পুরানো iPhone বিক্রি করে নতুন ফোন কিনলাম। Exchange offer সত্যিই ভালো। ধন্যবাদ Mobile GANJ!",
+    text: "Sold my old iPhone and bought a new phone. Exchange offer is really good. Thank you Mobile GANJ!",
     product: "Trade-in Service",
     avatar: "👨",
   },
@@ -36,7 +36,7 @@ const testimonials = [
     name: "Sumaiya Rahman",
     location: "Rangpur",
     rating: 4,
-    text: "Used phone কিনেছি, condition ekdom new মনে হচ্ছে। Battery health 92%। ভালো লেগেছে।",
+    text: "Bought a used phone, condition feels brand new. Battery health 92%. Really satisfied.",
     product: "Used iPhone 14 Pro",
     avatar: "👩",
   },
@@ -68,7 +68,7 @@ export default function TestimonialsSection() {
           {[...testimonials, ...testimonials].map((t, idx) => (
             <div
               key={`${t.id}-${idx}`}
-              className="bg-card border rounded-xl p-5 hover:shadow-md transition-all w-[280px] md:w-[320px] shrink-0 whitespace-normal"
+              className="bg-card border rounded-xl p-5 hover:shadow-md transition-all w-70 md:w-[320px] shrink-0 whitespace-normal"
             >
               <Quote className="w-8 h-8 text-primary/20 mb-3" />
               <p className="text-sm text-muted-foreground mb-4 leading-relaxed">

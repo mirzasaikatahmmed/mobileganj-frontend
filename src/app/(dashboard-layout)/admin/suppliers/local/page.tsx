@@ -14,8 +14,8 @@ const mockSellers = [
 export default function LocalSellersPage() {
   const [search, setSearch] = useState('');
 
-  const filtered = mockSellers.filter(s => 
-    s.fullName.toLowerCase().includes(search.toLowerCase()) || 
+  const filtered = mockSellers.filter(s =>
+    s.fullName.toLowerCase().includes(search.toLowerCase()) ||
     s.phone.includes(search)
   );
 
