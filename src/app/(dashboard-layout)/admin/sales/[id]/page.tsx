@@ -1,10 +1,32 @@
 'use client';
 
+import { use } from 'react';
 import { ArrowLeft, Printer, Download } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useSale } from '@/hooks/use-sales';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import { format } from 'date-fns';
 
-export default function SaleDetailsPage({ params }: { params: { id: string } }) {
+export default function SaleDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { data: sale, isLoading } = useSale(id);
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!sale) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold mb-2">Sale not found</h2>
+        <Link href="/admin/sales">
+          <Button>Back to Sales</Button>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
@@ -16,14 +38,16 @@ export default function SaleDetailsPage({ params }: { params: { id: string } }) 
           </Link>
           <div>
             <h1 className="text-3xl font-bold">Invoice Details</h1>
-            <p className="text-muted-foreground">INV-001</p>
+            <p className="text-muted-foreground">{sale.invoiceNo}</p>
           </div>
         </div>
         <div className="flex gap-2">
-          <Button>
-            <Printer className="w-4 h-4 mr-2" />
-            Print
-          </Button>
+          <Link href={`/admin/sales/invoice/${sale.invoiceNo}`}>
+            <Button>
+              <Printer className="w-4 h-4 mr-2" />
+              Print
+            </Button>
+          </Link>
           <Button variant="outline">
             <Download className="w-4 h-4 mr-2" />
             Download
@@ -31,9 +55,7 @@ export default function SaleDetailsPage({ params }: { params: { id: string } }) 
         </div>
       </div>
 
-      {/* Invoice */}
       <div className="card-base p-8 space-y-6">
-        {/* Header */}
         <div className="flex justify-between border-b pb-6">
           <div>
             <h2 className="text-2xl font-bold">Mobile GANJ</h2>
@@ -42,20 +64,22 @@ export default function SaleDetailsPage({ params }: { params: { id: string } }) 
           </div>
           <div className="text-right">
             <p className="text-sm text-muted-foreground">Invoice No</p>
-            <p className="text-xl font-bold">INV-001</p>
-            <p className="text-sm text-muted-foreground mt-2">Date: 2024-01-29</p>
+            <p className="text-xl font-bold">{sale.invoiceNo}</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Date: {format(new Date(sale.saleDate), 'dd MMM yyyy')}
+            </p>
           </div>
         </div>
 
-        {/* Customer Info */}
         <div>
           <h3 className="font-semibold mb-2">Customer Information</h3>
-          <p className="text-sm">Karim Ahmed</p>
-          <p className="text-sm text-muted-foreground">Phone: 01712345678</p>
-          <p className="text-sm text-muted-foreground">Address: Dhaka, Bangladesh</p>
+          <p className="text-sm">{sale.customer.name}</p>
+          <p className="text-sm text-muted-foreground">Phone: {sale.customer.phone}</p>
+          {sale.customer.address && (
+            <p className="text-sm text-muted-foreground">Address: {sale.customer.address}</p>
+          )}
         </div>
 
-        {/* Products */}
         <div>
           <table className="w-full">
             <thead className="border-b">
@@ -67,57 +91,70 @@ export default function SaleDetailsPage({ params }: { params: { id: string } }) 
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b">
-                <td className="py-3">
-                  <p className="font-medium">iPhone 15 Pro Max</p>
-                  <p className="text-xs text-muted-foreground">IMEI: 123456789012345</p>
-                </td>
-                <td className="text-center">1</td>
-                <td className="text-right">৳145,000</td>
-                <td className="text-right font-semibold">৳145,000</td>
-              </tr>
+              {sale.items.map((item) => (
+                <tr key={item.id} className="border-b">
+                  <td className="py-3">
+                    <p className="font-medium">{item.product.title}</p>
+                    {item.imei && (
+                      <p className="text-xs text-muted-foreground">IMEI: {item.imei}</p>
+                    )}
+                  </td>
+                  <td className="text-center">{item.quantity}</td>
+                  <td className="text-right">৳{item.unitPrice.toLocaleString()}</td>
+                  <td className="text-right font-semibold">৳{item.totalPrice.toLocaleString()}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
 
-        {/* Summary */}
         <div className="flex justify-end">
           <div className="w-64 space-y-2">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>৳145,000</span>
+              <span>৳{sale.subtotal.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
               <span>Discount</span>
-              <span>৳0</span>
+              <span>৳{sale.discountAmount.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-lg font-bold border-t pt-2">
               <span>Grand Total</span>
-              <span>৳145,000</span>
+              <span>৳{sale.grandTotal.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-green-600">
               <span>Paid</span>
-              <span>৳145,000</span>
+              <span>৳{sale.paidAmount.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-red-600">
               <span>Due</span>
-              <span>৳0</span>
+              <span>৳{sale.dueAmount.toLocaleString()}</span>
             </div>
           </div>
         </div>
 
-        {/* Status */}
         <div className="flex justify-between items-center border-t pt-4">
           <div>
             <p className="text-sm text-muted-foreground">Payment Method</p>
-            <p className="font-medium">Cash</p>
+            <p className="font-medium capitalize">{sale.paymentMethod}</p>
           </div>
           <div>
-            <span className="px-4 py-2 rounded-full bg-green-100 text-green-700 font-medium">
-              Paid
+            <span className={`px-4 py-2 rounded-full font-medium ${
+              sale.status === 'paid' ? 'bg-green-100 text-green-700' :
+              sale.status === 'partial_paid' ? 'bg-yellow-100 text-yellow-700' :
+              'bg-red-100 text-red-700'
+            }`}>
+              {sale.status === 'paid' ? 'Paid' : sale.status === 'partial_paid' ? 'Partial Paid' : 'Due'}
             </span>
           </div>
         </div>
+
+        {sale.note && (
+          <div className="border-t pt-4">
+            <p className="text-sm text-muted-foreground">Note</p>
+            <p className="text-sm">{sale.note}</p>
+          </div>
+        )}
       </div>
     </div>
   );

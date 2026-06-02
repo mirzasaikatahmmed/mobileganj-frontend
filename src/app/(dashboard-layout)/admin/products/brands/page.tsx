@@ -6,64 +6,60 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import { motion } from 'framer-motion';
-import { toast } from 'sonner';
-
-// Mock data - Replace with API
-const mockBrands = [
-  { id: '1', name: 'Apple', productCount: 45, createdAt: '2024-01-15' },
-  { id: '2', name: 'Samsung', productCount: 38, createdAt: '2024-01-10' },
-  { id: '3', name: 'Google', productCount: 12, createdAt: '2024-01-05' },
-  { id: '4', name: 'OnePlus', productCount: 8, createdAt: '2024-01-01' },
-];
+import { useBrands, useCreateBrand, useUpdateBrand, useDeleteBrand } from '@/hooks/use-products';
+import { Brand } from '@/services/product.service';
 
 export default function BrandsPage() {
-  const [brands, setBrands] = useState(mockBrands);
+  const { data: brands, isLoading } = useBrands();
+  const createBrand = useCreateBrand();
+  const updateBrand = useUpdateBrand();
+  const deleteBrand = useDeleteBrand();
+  
   const [search, setSearch] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [editingBrand, setEditingBrand] = useState<any>(null);
+  const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   const [brandName, setBrandName] = useState('');
+  const [isActive, setIsActive] = useState(true);
 
-  const filteredBrands = brands.filter(brand =>
+  const filteredBrands = (brands || []).filter(brand =>
     brand.name.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!brandName.trim()) {
-      toast.error('Brand name is required');
-      return;
-    }
+    if (!brandName.trim()) return;
 
     if (editingBrand) {
-      setBrands(brands.map(b => b.id === editingBrand.id ? { ...b, name: brandName } : b));
-      toast.success('Brand updated successfully');
+      updateBrand.mutate(
+        { id: editingBrand.id, data: { name: brandName, isActive } },
+        { onSuccess: () => { setIsOpen(false); resetForm(); } }
+      );
     } else {
-      const newBrand = {
-        id: Date.now().toString(),
-        name: brandName,
-        productCount: 0,
-        createdAt: new Date().toISOString().split('T')[0],
-      };
-      setBrands([newBrand, ...brands]);
-      toast.success('Brand created successfully');
+      createBrand.mutate(
+        { name: brandName, isActive },
+        { onSuccess: () => { setIsOpen(false); resetForm(); } }
+      );
     }
+  };
 
-    setIsOpen(false);
+  const resetForm = () => {
     setBrandName('');
+    setIsActive(true);
     setEditingBrand(null);
   };
 
-  const handleEdit = (brand: any) => {
+  const handleEdit = (brand: Brand) => {
     setEditingBrand(brand);
     setBrandName(brand.name);
+    setIsActive(brand.isActive);
     setIsOpen(true);
   };
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this brand?')) {
-      setBrands(brands.filter(b => b.id !== id));
-      toast.success('Brand deleted successfully');
+      deleteBrand.mutate(id);
     }
   };
 
@@ -76,7 +72,7 @@ export default function BrandsPage() {
         </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => { setEditingBrand(null); setBrandName(''); }}>
+            <Button onClick={resetForm}>
               <Plus className="w-4 h-4 mr-2" />
               Add Brand
             </Button>
@@ -96,12 +92,22 @@ export default function BrandsPage() {
                   required
                 />
               </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  checked={isActive}
+                  onChange={(e) => setIsActive(e.target.checked)}
+                  className="h-4 w-4 rounded"
+                />
+                <Label htmlFor="isActive" className="cursor-pointer">Active</Label>
+              </div>
               <div className="flex gap-2 justify-end">
                 <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
                   Cancel
                 </Button>
-                <Button type="submit">
-                  {editingBrand ? 'Update' : 'Create'}
+                <Button type="submit" disabled={createBrand.isPending || updateBrand.isPending}>
+                  {createBrand.isPending || updateBrand.isPending ? 'Saving...' : editingBrand ? 'Update' : 'Create'}
                 </Button>
               </div>
             </form>
@@ -109,20 +115,28 @@ export default function BrandsPage() {
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div className="card-base p-4">
-          <p className="text-sm text-muted-foreground">Total Brands</p>
-          <h3 className="text-2xl font-bold mt-1">{brands.length}</h3>
+      {isLoading ? (
+        <div className="grid grid-cols-3 gap-4">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-20 rounded-lg" />
+          ))}
         </div>
-        <div className="card-base p-4">
-          <p className="text-sm text-muted-foreground">Total Products</p>
-          <h3 className="text-2xl font-bold mt-1">{brands.reduce((sum, b) => sum + b.productCount, 0)}</h3>
+      ) : (
+        <div className="grid grid-cols-3 gap-4">
+          <div className="card-base p-4">
+            <p className="text-sm text-muted-foreground">Total Brands</p>
+            <h3 className="text-2xl font-bold mt-1">{brands?.length || 0}</h3>
+          </div>
+          <div className="card-base p-4">
+            <p className="text-sm text-muted-foreground">Active Brands</p>
+            <h3 className="text-2xl font-bold mt-1 text-green-600">{brands?.filter(b => b.isActive).length || 0}</h3>
+          </div>
+          <div className="card-base p-4">
+            <p className="text-sm text-muted-foreground">Inactive Brands</p>
+            <h3 className="text-2xl font-bold mt-1 text-muted-foreground">{brands?.filter(b => !b.isActive).length || 0}</h3>
+          </div>
         </div>
-        <div className="card-base p-4">
-          <p className="text-sm text-muted-foreground">Active Brands</p>
-          <h3 className="text-2xl font-bold mt-1">{brands.filter(b => b.productCount > 0).length}</h3>
-        </div>
-      </div>
+      )}
 
       <div className="card-base p-4">
         <div className="relative">
@@ -136,7 +150,14 @@ export default function BrandsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <Skeleton key={i} className="h-32 rounded-lg" />
+          ))}
+        </div>
+      ) : filteredBrands.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredBrands.map((brand, index) => (
           <motion.div
             key={brand.id}
@@ -152,7 +173,13 @@ export default function BrandsPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">{brand.name}</h3>
-                  <p className="text-sm text-muted-foreground">{brand.productCount} products</p>
+                  <p className="text-sm text-muted-foreground">
+                    {brand.isActive ? (
+                      <span className="text-green-600">Active</span>
+                    ) : (
+                      <span className="text-muted-foreground">Inactive</span>
+                    )}
+                  </p>
                 </div>
               </div>
               <div className="flex gap-1">
@@ -164,6 +191,7 @@ export default function BrandsPage() {
                   size="icon"
                   className="text-destructive"
                   onClick={() => handleDelete(brand.id)}
+                  disabled={deleteBrand.isPending}
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -174,7 +202,8 @@ export default function BrandsPage() {
             </div>
           </motion.div>
         ))}
-      </div>
+        </div>
+      ) : null}
 
       {filteredBrands.length === 0 && (
         <div className="card-base p-12 text-center">

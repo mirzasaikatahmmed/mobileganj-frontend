@@ -6,95 +6,55 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
+import { useProducts } from "@/hooks/use-products";
+import LoadingSpinner from "@/components/shared/LoadingSpinner";
 
 interface Product {
   id: string;
-  name: string;
-  price: number;
-  stock: number;
+  title: string;
+  sellingPrice: number;
+  offerPrice?: number;
+  stockQty: number;
   category: string;
-  imei?: string;
+  imei1?: string;
+  barcode: string;
 }
 
-const mockProducts: Product[] = [
-  {
-    id: "1",
-    name: "iPhone 15 Pro Max",
-    price: 145000,
-    stock: 5,
-    category: "Phone",
-    imei: "123456789012345",
-  },
-  {
-    id: "2",
-    name: "Samsung S24 Ultra",
-    price: 135000,
-    stock: 3,
-    category: "Phone",
-    imei: "987654321098765",
-  },
-  {
-    id: "3",
-    name: "AirPods Pro 2",
-    price: 25500,
-    stock: 15,
-    category: "Accessories",
-  },
-  {
-    id: "4",
-    name: "iPhone 15 Pro",
-    price: 125000,
-    stock: 8,
-    category: "Phone",
-    imei: "456789012345678",
-  },
-  {
-    id: "5",
-    name: "20W USB-C Charger",
-    price: 2500,
-    stock: 50,
-    category: "Accessories",
-  },
-  {
-    id: "6",
-    name: "Google Pixel 8 Pro",
-    price: 89000,
-    stock: 7,
-    category: "Phone",
-    imei: "111222333444555",
-  },
-  {
-    id: "7",
-    name: "Samsung Buds 2 Pro",
-    price: 18000,
-    stock: 12,
-    category: "Accessories",
-  },
-];
-
 interface ProductListProps {
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: { id: string; name: string; price: number; stock: number; imei?: string }) => void;
 }
 
 export default function ProductList({ onAddToCart }: ProductListProps) {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const filteredProducts = mockProducts.filter((p) => {
-    const searchLower = search.toLowerCase();
-    const matchesSearch = 
-      p.name.toLowerCase().includes(searchLower) || 
-      (p.imei && p.imei.toLowerCase().includes(searchLower));
-      
-    const matchesCategory =
-      selectedCategory === "all" || p.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+  const { data: productsData, isLoading } = useProducts({
+    search,
+    category: selectedCategory === "all" ? undefined : selectedCategory,
+    status: 'in_stock',
   });
 
+  const products = productsData?.data || [];
+
   const handleAddToCart = (product: Product) => {
-    onAddToCart(product);
-    toast.success(`${product.name} added to cart`);
+    const price = product.offerPrice || product.sellingPrice;
+    onAddToCart({
+      id: product.id,
+      name: product.title,
+      price,
+      stock: product.stockQty,
+      imei: product.imei1,
+    });
+    toast.success(`${product.title} added to cart`);
   };
+
+  if (isLoading) {
+    return (
+      <div className="card-base p-4">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <div className="card-base p-4 space-y-4 sticky top-6">
@@ -123,16 +83,16 @@ export default function ProductList({ onAddToCart }: ProductListProps) {
         </Button>
         <Button
           size="sm"
-          variant={selectedCategory === "Phone" ? "default" : "outline"}
-          onClick={() => setSelectedCategory("Phone")}
+          variant={selectedCategory === "phone" ? "default" : "outline"}
+          onClick={() => setSelectedCategory("phone")}
           className="text-xs"
         >
           Phones
         </Button>
         <Button
           size="sm"
-          variant={selectedCategory === "Accessories" ? "default" : "outline"}
-          onClick={() => setSelectedCategory("Accessories")}
+          variant={selectedCategory === "accessories" ? "default" : "outline"}
+          onClick={() => setSelectedCategory("accessories")}
           className="text-xs"
         >
           Accessories
@@ -142,7 +102,7 @@ export default function ProductList({ onAddToCart }: ProductListProps) {
       {/* Product List */}
       <ScrollArea className="h-[calc(100vh-400px)]">
         <div className="space-y-2">
-          {filteredProducts.map((product) => (
+          {products.map((product: Product) => (
             <div
               key={product.id}
               className="p-3 rounded-lg border hover:border-primary cursor-pointer transition-colors group"
@@ -154,13 +114,13 @@ export default function ProductList({ onAddToCart }: ProductListProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm truncate group-hover:text-primary transition-colors">
-                    {product.name}
+                    {product.title}
                   </p>
                   <p className="text-sm font-semibold text-primary">
-                    ৳{product.price.toLocaleString()}
+                    ৳{(product.offerPrice || product.sellingPrice).toLocaleString()}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Stock: {product.stock}
+                    Stock: {product.stockQty}
                   </p>
                 </div>
               </div>
@@ -169,7 +129,7 @@ export default function ProductList({ onAddToCart }: ProductListProps) {
         </div>
       </ScrollArea>
 
-      {filteredProducts.length === 0 && (
+      {products.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
           <Package className="w-12 h-12 mx-auto mb-2 opacity-50" />
           <p className="text-sm">No products found</p>
