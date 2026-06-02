@@ -11,27 +11,29 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, X, ScanLine, ChevronDown, Check } from 'lucide-react';
 import DateTimeField from './DateTimeField';
 import { MultiImageUpload } from './MultiImageUpload';
+import { useBrands } from '@/hooks/use-products';
+import { useProductSettings } from '@/hooks/use-product-settings';
+import { ProductSettingType } from '@/services/product-settings.service';
 
-// Mock data - Replace with API
-const mockBrands = [
-  { id: '1', name: 'Apple' },
-  { id: '2', name: 'Samsung' },
-  { id: '3', name: 'Google' },
-];
-
-const mockRegions = [
-  { value: 'usa', label: 'USA' },
-  { value: 'japan', label: 'Japan' },
-  { value: 'australia', label: 'Australia' },
-  { value: 'uk', label: 'UK' },
-  { value: 'european', label: 'European' },
-  { value: 'other', label: 'Other' },
-];
-
-function RegionCombobox() {
-  const [regions, setRegions] = useState(mockRegions.map(r => r.label));
-  const [selected, setSelected] = useState<string>('');
-  const [inputValue, setInputValue] = useState('');
+function RegionCombobox({ value, onChange }: { value?: string; onChange?: (value: string) => void }) {
+  const { data: settings } = useProductSettings();
+  const regionOptions = settings?.regions || [];
+  const [regions, setRegions] = useState<string[]>([]);
+  
+  useEffect(() => {
+    if (regionOptions.length > 0) {
+      setRegions(regionOptions.map(r => r.name));
+    }
+  }, [regionOptions]);
+  const [selected, setSelected] = useState<string>(value || '');
+  const [inputValue, setInputValue] = useState(value || '');
+  
+  useEffect(() => {
+    if (value) {
+      setSelected(value);
+      setInputValue(value);
+    }
+  }, [value]);
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -43,6 +45,7 @@ function RegionCombobox() {
     setSelected(region);
     setInputValue(region);
     setIsOpen(false);
+    onChange?.(region);
   };
 
   const handleAdd = () => {
@@ -51,6 +54,7 @@ function RegionCombobox() {
     setRegions(prev => [...prev, trimmed]);
     setSelected(trimmed);
     setIsOpen(false);
+    onChange?.(trimmed);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -134,14 +138,8 @@ function RegionCombobox() {
   );
 }
 
-const mockSuppliers = [
-  { id: '1', name: 'Karim Phones', phone: '01711111111' },
-  { id: '2', name: 'Rahim Telecom', phone: '01822222222' },
-];
-
-
-
 export default function OverseasPhoneForm() {
+  const { data: brands, isLoading: brandsLoading } = useBrands();
   const [isNewSupplier, setIsNewSupplier] = useState(false);
   const [stockQty, setStockQty] = useState(1);
   const [barcodeStrategy, setBarcodeStrategy] = useState<'imei' | 'single' | 'unique'>('imei');
@@ -179,18 +177,7 @@ export default function OverseasPhoneForm() {
           <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
             <div className="col-span-2">
               <Label>Select Supplier *</Label>
-              <Select required>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select existing supplier" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockSuppliers.map(supplier => (
-                    <SelectItem key={supplier.id} value={supplier.id}>
-                      {supplier.name} {supplier.phone ? `(${supplier.phone})` : ''}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input placeholder="Supplier selection - API integration pending" disabled />
             </div>
           </div>
         )}
@@ -212,12 +199,12 @@ export default function OverseasPhoneForm() {
           </div>
           <div>
             <Label>Brand *</Label>
-            <Select required>
+            <Select required disabled={brandsLoading}>
               <SelectTrigger>
-                <SelectValue placeholder="Select brand" />
+                <SelectValue placeholder={brandsLoading ? 'Loading...' : 'Select brand'} />
               </SelectTrigger>
               <SelectContent>
-                {mockBrands.map(brand => (
+                {brands?.map(brand => (
                   <SelectItem key={brand.id} value={brand.id}>{brand.name}</SelectItem>
                 ))}
               </SelectContent>

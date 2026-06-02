@@ -3,30 +3,32 @@
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Printer, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useSaleByInvoice } from '@/hooks/use-sales';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import { format } from 'date-fns';
 
-const mockInvoice = {
-  invoiceNo: 'INV-001234',
-  date: '2024-01-29',
-  customer: {
-    name: 'Karim Ahmed',
-    phone: '01712345678',
-    address: 'Dhaka, Bangladesh',
-  },
-  items: [
-    { id: '1', name: 'iPhone 15 Pro Max', imei: '123456789012345', qty: 1, price: 145000, warranty: '1 Year Official Warranty' },
-    { id: '2', name: 'AirPods Pro 2', qty: 2, price: 25500, warranty: '6 Months Warranty' },
-  ],
-  subtotal: 196000,
-  discount: 1000,
-  grandTotal: 195000,
-  paid: 195000,
-  due: 0,
-  paymentMethod: 'Cash',
-  status: 'Paid',
-};
-
-export default function InvoicePage() {
+export default function InvoicePage({ params }: { params: { id: string } }) {
   const router = useRouter();
+  const { data: sale, isLoading } = useSaleByInvoice(params.id);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (!sale) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">Invoice not found</h2>
+          <Button onClick={() => router.back()}>Go Back</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -60,17 +62,19 @@ export default function InvoicePage() {
             </div>
             <div className="text-right">
               <p className="text-sm text-muted-foreground">Invoice No</p>
-              <p className="text-xl font-bold">{mockInvoice.invoiceNo}</p>
+              <p className="text-xl font-bold">{sale.invoiceNo}</p>
               <p className="text-sm text-muted-foreground mt-2">Date</p>
-              <p className="font-medium">{new Date(mockInvoice.date).toLocaleDateString()}</p>
+              <p className="font-medium">{format(new Date(sale.saleDate), 'dd MMM yyyy')}</p>
             </div>
           </div>
 
           <div className="mb-8">
             <h3 className="font-semibold text-sm text-muted-foreground mb-2">BILL TO</h3>
-            <p className="font-semibold text-lg">{mockInvoice.customer.name}</p>
-            <p className="text-sm">{mockInvoice.customer.phone}</p>
-            <p className="text-sm text-muted-foreground">{mockInvoice.customer.address}</p>
+            <p className="font-semibold text-lg">{sale.customer.name}</p>
+            <p className="text-sm">{sale.customer.phone}</p>
+            {sale.customer.address && (
+              <p className="text-sm text-muted-foreground">{sale.customer.address}</p>
+            )}
           </div>
 
           <div className="mb-8">
@@ -85,17 +89,22 @@ export default function InvoicePage() {
                 </tr>
               </thead>
               <tbody>
-                {mockInvoice.items.map((item, index) => (
+                {sale.items.map((item, index) => (
                   <tr key={item.id} className="border-b">
                     <td className="p-3">{index + 1}</td>
                     <td className="p-3">
-                      <p className="font-medium">{item.name}</p>
+                      <p className="font-medium">{item.product.title}</p>
                       {item.imei && <p className="text-xs text-muted-foreground">IMEI: {item.imei}</p>}
-                      <p className="text-xs text-muted-foreground">{item.warranty}</p>
+                      {item.warrantyMonths && (
+                        <p className="text-xs text-muted-foreground">{item.warrantyMonths} Months Warranty</p>
+                      )}
+                      {item.customWarrantyText && (
+                        <p className="text-xs text-muted-foreground">{item.customWarrantyText}</p>
+                      )}
                     </td>
-                    <td className="p-3 text-center">{item.qty}</td>
-                    <td className="p-3 text-right">৳{item.price.toLocaleString()}</td>
-                    <td className="p-3 text-right font-medium">৳{(item.price * item.qty).toLocaleString()}</td>
+                    <td className="p-3 text-center">{item.quantity}</td>
+                    <td className="p-3 text-right">৳{item.unitPrice.toLocaleString()}</td>
+                    <td className="p-3 text-right font-medium">৳{item.totalPrice.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -106,22 +115,28 @@ export default function InvoicePage() {
             <div className="w-64 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal:</span>
-                <span className="font-medium">৳{mockInvoice.subtotal.toLocaleString()}</span>
+                <span className="font-medium">৳{sale.subtotal.toLocaleString()}</span>
               </div>
-              {mockInvoice.discount > 0 && (
+              {sale.discountAmount > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Discount:</span>
-                  <span className="font-medium text-red-600">-৳{mockInvoice.discount.toLocaleString()}</span>
+                  <span className="font-medium text-red-600">-৳{sale.discountAmount.toLocaleString()}</span>
                 </div>
               )}
               <div className="flex justify-between text-lg font-bold pt-2 border-t">
                 <span>Grand Total:</span>
-                <span className="text-primary">৳{mockInvoice.grandTotal.toLocaleString()}</span>
+                <span className="text-primary">৳{sale.grandTotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Paid:</span>
-                <span className="font-medium text-green-600">৳{mockInvoice.paid.toLocaleString()}</span>
+                <span className="font-medium text-green-600">৳{sale.paidAmount.toLocaleString()}</span>
               </div>
+              {sale.dueAmount > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Due:</span>
+                  <span className="font-medium text-red-600">৳{sale.dueAmount.toLocaleString()}</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -129,12 +144,16 @@ export default function InvoicePage() {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">Payment Method</p>
-                <p className="font-medium">{mockInvoice.paymentMethod}</p>
+                <p className="font-medium capitalize">{sale.paymentMethod}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">Status</p>
-                <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                  {mockInvoice.status}
+                <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                  sale.status === 'paid' ? 'bg-green-100 text-green-700' :
+                  sale.status === 'partial_paid' ? 'bg-yellow-100 text-yellow-700' :
+                  'bg-red-100 text-red-700'
+                }`}>
+                  {sale.status === 'paid' ? 'Paid' : sale.status === 'partial_paid' ? 'Partial Paid' : 'Due'}
                 </span>
               </div>
             </div>

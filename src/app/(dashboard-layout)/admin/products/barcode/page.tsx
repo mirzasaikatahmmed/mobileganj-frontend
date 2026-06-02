@@ -7,55 +7,57 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { motion } from 'framer-motion';
-import { toast } from 'sonner';
-
-const mockProducts = [
-  { id: '1', name: 'iPhone 15 Pro Max', barcode: 'IP15PM001', price: 145000, selected: false },
-  { id: '2', name: 'Samsung S24 Ultra', barcode: 'SGS24U001', price: 135000, selected: false },
-  { id: '3', name: 'AirPods Pro 2', barcode: 'APP2001', price: 25500, selected: false },
-  { id: '4', name: 'Google Pixel 8 Pro', barcode: 'GP8P001', price: 89000, selected: false },
-];
+import { useProducts } from '@/hooks/use-products';
+import { productService } from '@/services/product.service';
+import { showToast } from '@/lib/toast';
 
 export default function BarcodePage() {
-  const [products, setProducts] = useState(mockProducts);
+  const { data: productsData, isLoading } = useProducts({ limit: 100 });
+  const products = productsData?.data || [];
+  
   const [search, setSearch] = useState('');
   const [labelSize, setLabelSize] = useState('40x25');
   const [showPrice, setShowPrice] = useState(true);
   const [showName, setShowName] = useState(true);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const filteredProducts = products.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
+    p.title.toLowerCase().includes(search.toLowerCase()) ||
     p.barcode.toLowerCase().includes(search.toLowerCase())
   );
 
-  const selectedProducts = products.filter(p => p.selected);
+  const selectedProducts = products.filter(p => selectedIds.includes(p.id));
 
   const toggleProduct = (id: string) => {
-    setProducts(products.map(p => p.id === id ? { ...p, selected: !p.selected } : p));
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
   };
 
   const toggleAll = () => {
-    const allSelected = products.every(p => p.selected);
-    setProducts(products.map(p => ({ ...p, selected: !allSelected })));
+    if (selectedIds.length === filteredProducts.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredProducts.map(p => p.id));
+    }
   };
 
   const handlePrint = () => {
     if (selectedProducts.length === 0) {
-      toast.error('Please select at least one product');
+      showToast.error('Please select at least one product');
       return;
     }
-    toast.success(`Printing ${selectedProducts.length} barcode(s)...`);
-    // Implement print logic
+    showToast.success(`Printing ${selectedProducts.length} barcode(s)...`);
   };
 
   const handleDownload = () => {
     if (selectedProducts.length === 0) {
-      toast.error('Please select at least one product');
+      showToast.error('Please select at least one product');
       return;
     }
-    toast.success(`Downloading ${selectedProducts.length} barcode(s)...`);
-    // Implement download logic
+    showToast.success(`Downloading ${selectedProducts.length} barcode(s)...`);
   };
 
   return (
@@ -138,6 +140,13 @@ export default function BarcodePage() {
             </div>
           </div>
 
+          {isLoading ? (
+            <div className="card-base p-4 space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full" />
+              ))}
+            </div>
+          ) : (
           <div className="card-base overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -145,7 +154,7 @@ export default function BarcodePage() {
                   <tr>
                     <th className="text-left p-4">
                       <Checkbox
-                        checked={products.every(p => p.selected)}
+                        checked={selectedIds.length === filteredProducts.length && filteredProducts.length > 0}
                         onCheckedChange={toggleAll}
                       />
                     </th>
@@ -165,19 +174,20 @@ export default function BarcodePage() {
                     >
                       <td className="p-4">
                         <Checkbox
-                          checked={product.selected}
+                          checked={selectedIds.includes(product.id)}
                           onCheckedChange={() => toggleProduct(product.id)}
                         />
                       </td>
-                      <td className="p-4 font-medium">{product.name}</td>
+                      <td className="p-4 font-medium">{product.title}</td>
                       <td className="p-4 font-mono text-sm">{product.barcode}</td>
-                      <td className="p-4 text-right">৳{product.price.toLocaleString()}</td>
+                      <td className="p-4 text-right">৳{product.sellingPrice.toLocaleString()}</td>
                     </motion.tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>

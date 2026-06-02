@@ -6,117 +6,84 @@ import { Plus, Search, Eye, Edit, Trash2, AlertTriangle, Smartphone, Headphones,
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useProducts, useProductSummary, useDeleteProduct } from '@/hooks/use-products';
+import { Product } from '@/services/product.service';
 
-type ProductStatus = 'In Stock' | 'Out of Stock' | 'Low Stock';
-type ProductCategory = 'Phone' | 'Accessories' | 'Others';
-type ProductType = 'Overseas' | 'Local' | '—';
-
-interface Product {
-  id: string;
-  name: string;
-  category: ProductCategory;
-  type: ProductType;
-  imei: string;
-  purchase: number;
-  selling: number;
-  stock: number;
-  status: ProductStatus;
-}
-
-const products: Product[] = [
-  { id: '1', name: 'iPhone 15 Pro Max', category: 'Phone', type: 'Overseas', imei: '123456789012345', purchase: 139000, selling: 145000, stock: 5, status: 'In Stock' },
-  { id: '2', name: 'Samsung S24 Ultra', category: 'Phone', type: 'Overseas', imei: '987654321098765', purchase: 129000, selling: 135000, stock: 3, status: 'In Stock' },
-  { id: '3', name: 'iPhone 14 Pro', category: 'Phone', type: 'Local', imei: '456789012345678', purchase: 95000, selling: 105000, stock: 0, status: 'Out of Stock' },
-  { id: '4', name: 'Samsung A54', category: 'Phone', type: 'Local', imei: '321098765432109', purchase: 32000, selling: 38000, stock: 7, status: 'In Stock' },
-  { id: '5', name: 'AirPods Pro 2', category: 'Accessories', type: '—', imei: '—', purchase: 22000, selling: 25500, stock: 15, status: 'In Stock' },
-  { id: '6', name: 'Samsung Earbuds', category: 'Accessories', type: '—', imei: '—', purchase: 8000, selling: 9500, stock: 2, status: 'Low Stock' },
-  { id: '7', name: 'Phone Case (Universal)', category: 'Others', type: '—', imei: '—', purchase: 300, selling: 500, stock: 50, status: 'In Stock' },
-  { id: '8', name: 'Screen Protector', category: 'Others', type: '—', imei: '—', purchase: 150, selling: 300, stock: 100, status: 'In Stock' },
-];
-
-type TabKey = 'all' | 'overseas' | 'local' | 'accessories' | 'others';
+type TabKey = 'all' | 'overseas' | 'local' | 'accessories';
 
 const TABS: { key: TabKey; label: string; icon: React.ReactNode; color: string }[] = [
   { key: 'all',         label: 'All Products',    icon: <Package className="w-4 h-4" />,     color: 'text-foreground' },
   { key: 'overseas',   label: 'Overseas Phone',   icon: <Globe className="w-4 h-4" />,       color: 'text-blue-600 dark:text-blue-400' },
   { key: 'local',      label: 'Local Phone',      icon: <Smartphone className="w-4 h-4" />,  color: 'text-green-600 dark:text-green-400' },
   { key: 'accessories',label: 'Accessories',      icon: <Headphones className="w-4 h-4" />,  color: 'text-purple-600 dark:text-purple-400' },
-  { key: 'others',     label: 'Others',           icon: <ChevronRight className="w-4 h-4" />, color: 'text-orange-600 dark:text-orange-400' },
 ];
 
-function getStatusBadge(status: ProductStatus) {
-  switch (status) {
-    case 'In Stock':
-      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">In Stock</span>;
-    case 'Out of Stock':
-      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">Out of Stock</span>;
-    case 'Low Stock':
-      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">Low Stock</span>;
+function getStatusBadge(status: string) {
+  if (status === 'in_stock') {
+    return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">In Stock</span>;
+  } else if (status === 'out_of_stock') {
+    return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">Out of Stock</span>;
+  } else if (status === 'sold') {
+    return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">Sold</span>;
+  } else if (status === 'damaged') {
+    return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">Damaged</span>;
   }
+  return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400">{status}</span>;
 }
 
 export default function ProductsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const availableProducts = useMemo(() => products.filter(p => p.status !== 'Out of Stock'), []);
-
-  const filteredProducts = useMemo(() => {
-    let result = availableProducts;
-
-    // Filter by tab
-    switch (activeTab) {
-      case 'overseas':
-        result = result.filter(p => p.category === 'Phone' && p.type === 'Overseas');
-        break;
-      case 'local':
-        result = result.filter(p => p.category === 'Phone' && p.type === 'Local');
-        break;
-      case 'accessories':
-        result = result.filter(p => p.category === 'Accessories');
-        break;
-      case 'others':
-        result = result.filter(p => p.category === 'Others');
-        break;
-      // 'all' — no filter
+  // Build filter based on active tab
+  const filter = useMemo(() => {
+    const f: any = { page, limit: 20, search: searchQuery || undefined };
+    
+    if (activeTab === 'overseas') {
+      f.category = 'phone';
+      f.phoneType = 'overseas';
+    } else if (activeTab === 'local') {
+      f.category = 'phone';
+      f.phoneType = 'local';
+    } else if (activeTab === 'accessories') {
+      f.category = 'accessories';
     }
-
-    // Filter by search
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        p.imei.toLowerCase().includes(q)
-      );
-    }
-
-    // Filter by status
+    
     if (statusFilter !== 'all') {
-      const map: Record<string, ProductStatus> = {
-        'in-stock': 'In Stock',
-        'out-of-stock': 'Out of Stock',
-        'low-stock': 'Low Stock',
-      };
-      result = result.filter(p => p.status === map[statusFilter]);
+      f.status = statusFilter;
     }
+    
+    return f;
+  }, [activeTab, searchQuery, statusFilter, page]);
 
-    return result;
-  }, [activeTab, searchQuery, statusFilter]);
+  const { data: productsData, isLoading, error } = useProducts(filter);
+  const { data: summary } = useProductSummary();
+  const deleteProduct = useDeleteProduct();
 
-  // Summary counts
+  const products = productsData?.data || [];
+  const meta = productsData?.meta;
+
+  // Calculate counts for tabs
   const counts = useMemo(() => ({
-    all: availableProducts.length,
-    overseas: availableProducts.filter(p => p.category === 'Phone' && p.type === 'Overseas').length,
-    local: availableProducts.filter(p => p.category === 'Phone' && p.type === 'Local').length,
-    accessories: availableProducts.filter(p => p.category === 'Accessories').length,
-    others: availableProducts.filter(p => p.category === 'Others').length,
-  }), [availableProducts]);
+    all: summary?.totalProducts || 0,
+    overseas: products.filter(p => p.category === 'phone' && p.phoneType === 'overseas').length,
+    local: products.filter(p => p.category === 'phone' && p.phoneType === 'local').length,
+    accessories: products.filter(p => p.category === 'accessories').length,
+  }), [summary, products]);
 
-  // Show IMEI column only for phone tabs
   const showImei = activeTab === 'all' || activeTab === 'overseas' || activeTab === 'local';
+
+  const handleDelete = (id: string) => {
+    if (confirm('Are you sure you want to delete this product?')) {
+      deleteProduct.mutate(id);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -143,20 +110,32 @@ export default function ProductsPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <div className="card-base p-4">
-          <p className="text-sm text-muted-foreground">Total Products</p>
-          <h3 className="text-2xl font-bold mt-1">{availableProducts.length}</h3>
+      {summary ? (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="card-base p-4">
+            <p className="text-sm text-muted-foreground">Total Products</p>
+            <h3 className="text-2xl font-bold mt-1">{summary.totalProducts}</h3>
+          </div>
+          <div className="card-base p-4">
+            <p className="text-sm text-muted-foreground">Total Stock</p>
+            <h3 className="text-2xl font-bold mt-1 text-blue-600">{summary.totalStockQty}</h3>
+          </div>
+          <div className="card-base p-4">
+            <p className="text-sm text-muted-foreground">Low Stock</p>
+            <h3 className="text-2xl font-bold mt-1 text-yellow-600">{summary.lowStockItems}</h3>
+          </div>
+          <div className="card-base p-4">
+            <p className="text-sm text-muted-foreground">Out of Stock</p>
+            <h3 className="text-2xl font-bold mt-1 text-red-600">{summary.outOfStockItems}</h3>
+          </div>
         </div>
-        <div className="card-base p-4">
-          <p className="text-sm text-muted-foreground">In Stock</p>
-          <h3 className="text-2xl font-bold mt-1 text-green-600">{availableProducts.filter(p => p.status === 'In Stock').length}</h3>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-20 rounded-lg" />
+          ))}
         </div>
-        <div className="card-base p-4">
-          <p className="text-sm text-muted-foreground">Low Stock</p>
-          <h3 className="text-2xl font-bold mt-1 text-yellow-600">{availableProducts.filter(p => p.status === 'Low Stock').length}</h3>
-        </div>
-      </div>
+      )}
 
       {/* Category Tabs */}
       <div className="card-base overflow-hidden">
@@ -206,8 +185,10 @@ export default function ProductsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="in-stock">In Stock</SelectItem>
-                <SelectItem value="low-stock">Low Stock</SelectItem>
+                <SelectItem value="in_stock">In Stock</SelectItem>
+                <SelectItem value="out_of_stock">Out of Stock</SelectItem>
+                <SelectItem value="sold">Sold</SelectItem>
+                <SelectItem value="damaged">Damaged</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -237,8 +218,26 @@ export default function ProductsPage() {
               </tr>
             </thead>
             <tbody>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={10} className="p-4">
+                    <div className="space-y-3">
+                      {[...Array(5)].map((_, i) => (
+                        <Skeleton key={i} className="h-12 w-full" />
+                      ))}
+                    </div>
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={10} className="text-center py-12 text-destructive">
+                    <AlertTriangle className="w-10 h-10 mx-auto mb-3" />
+                    <p>Failed to load products</p>
+                  </td>
+                </tr>
+              ) : (
               <AnimatePresence mode="wait">
-                {filteredProducts.length === 0 ? (
+                {products.length === 0 ? (
                   <tr>
                     <td colSpan={10} className="text-center py-12 text-muted-foreground">
                       <Package className="w-10 h-10 mx-auto mb-3 opacity-30" />
@@ -246,7 +245,7 @@ export default function ProductsPage() {
                     </td>
                   </tr>
                 ) : (
-                  filteredProducts.map((product, index) => (
+                  products.map((product, index) => (
                     <motion.tr
                       key={product.id}
                       initial={{ opacity: 0, y: 8 }}
@@ -255,31 +254,31 @@ export default function ProductsPage() {
                       transition={{ delay: index * 0.04 }}
                       className="border-t hover:bg-muted/30 transition-colors"
                     >
-                      <td className="p-4 text-sm text-muted-foreground whitespace-nowrap">{index + 1}</td>
-                      <td className="p-4 font-medium min-w-[180px]">{product.name}</td>
+                      <td className="p-4 text-sm text-muted-foreground whitespace-nowrap">{(page - 1) * 20 + index + 1}</td>
+                      <td className="p-4 font-medium min-w-[180px]">{product.title}</td>
                       {activeTab === 'all' && (
-                        <td className="p-4 text-sm">{product.category}</td>
+                        <td className="p-4 text-sm capitalize">{product.category}</td>
                       )}
                       {(activeTab === 'all' || activeTab === 'overseas' || activeTab === 'local') && (
                         <td className="p-4">
-                          <span className={cn(
-                            'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
-                            product.type === 'Overseas'
-                              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                              : product.type === 'Local'
-                              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                              : 'bg-muted text-muted-foreground'
-                          )}>
-                            {product.type}
-                          </span>
+                          {product.phoneType && (
+                            <span className={cn(
+                              'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize',
+                              product.phoneType === 'overseas'
+                                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                                : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                            )}>
+                              {product.phoneType}
+                            </span>
+                          )}
                         </td>
                       )}
                       {showImei && (
-                        <td className="p-4 text-sm text-muted-foreground font-mono">{product.imei}</td>
+                        <td className="p-4 text-sm text-muted-foreground font-mono">{product.imei1 || '—'}</td>
                       )}
-                      <td className="p-4 text-right text-sm">৳{product.purchase.toLocaleString()}</td>
-                      <td className="p-4 text-right text-sm font-medium">৳{product.selling.toLocaleString()}</td>
-                      <td className="p-4 text-center text-sm font-semibold">{product.stock}</td>
+                      <td className="p-4 text-right text-sm">৳{product.purchasePrice.toLocaleString()}</td>
+                      <td className="p-4 text-right text-sm font-medium">৳{product.sellingPrice.toLocaleString()}</td>
+                      <td className="p-4 text-center text-sm font-semibold">{product.stockQty}</td>
                       <td className="p-4 text-center">{getStatusBadge(product.status)}</td>
                       <td className="p-4">
                         <div className="flex items-center justify-center gap-1">
@@ -293,7 +292,13 @@ export default function ProductsPage() {
                               <Edit className="w-4 h-4" />
                             </Button>
                           </Link>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            onClick={() => handleDelete(product.id)}
+                            disabled={deleteProduct.isPending}
+                          >
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
@@ -302,14 +307,33 @@ export default function ProductsPage() {
                   ))
                 )}
               </AnimatePresence>
+              )}
             </tbody>
           </table>
         </div>
 
         {/* Footer */}
-        {filteredProducts.length > 0 && (
-          <div className="px-4 py-3 border-t bg-muted/20 text-sm text-muted-foreground">
-            Showing {filteredProducts.length} of {counts[activeTab]} products
+        {meta && products.length > 0 && (
+          <div className="px-4 py-3 border-t bg-muted/20 text-sm text-muted-foreground flex items-center justify-between">
+            <span>Showing {products.length} of {meta.total} products</span>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                disabled={page === 1}
+                onClick={() => setPage(p => p - 1)}
+              >
+                Previous
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                disabled={page >= meta.totalPages}
+                onClick={() => setPage(p => p + 1)}
+              >
+                Next
+              </Button>
+            </div>
           </div>
         )}
       </div>

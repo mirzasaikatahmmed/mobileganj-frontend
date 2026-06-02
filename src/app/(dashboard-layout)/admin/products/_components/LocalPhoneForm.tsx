@@ -11,15 +11,10 @@ import { ScanLine } from 'lucide-react';
 import DateTimeField from './DateTimeField';
 import LocalSellerInvoice, { LocalSellerInvoiceData } from './LocalSellerInvoice';
 import { MultiImageUpload } from './MultiImageUpload';
-
-// Mock data - Replace with API
-const mockBrands = [
-  { id: '1', name: 'Apple' },
-  { id: '2', name: 'Samsung' },
-  { id: '3', name: 'Google' },
-];
+import { useBrands } from '@/hooks/use-products';
 
 export default function LocalPhoneForm() {
+  const { data: brands, isLoading: brandsLoading } = useBrands();
   const [stockQty, setStockQty] = useState(1);
   const [showInvoice, setShowInvoice] = useState(false);
   const [invoiceData, setInvoiceData] = useState<LocalSellerInvoiceData | null>(null);
@@ -59,7 +54,7 @@ export default function LocalPhoneForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const brandLabel = mockBrands.find(b => b.id === brand)?.name;
+    const brandLabel = brands?.find(b => b.id === brand)?.name;
     const data: LocalSellerInvoiceData = {
       invoiceNo: `INV-${Date.now().toString().slice(-6)}`,
       date: new Date().toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' }),
@@ -160,12 +155,12 @@ export default function LocalPhoneForm() {
             </div>
             <div>
               <Label>Brand *</Label>
-              <Select required onValueChange={setBrand}>
+              <Select required onValueChange={setBrand} disabled={brandsLoading}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select brand" />
+                  <SelectValue placeholder={brandsLoading ? 'Loading...' : 'Select brand'} />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockBrands.map(b => (
+                  {brands?.map(b => (
                     <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
                   ))}
                 </SelectContent>

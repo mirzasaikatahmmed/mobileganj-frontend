@@ -1,70 +1,43 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Edit, Trash2, Settings2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 import { motion } from 'framer-motion';
-import { toast } from 'sonner';
+import {
+  useProductSettings,
+  useCreateProductSetting,
+  useUpdateProductSetting,
+  useDeleteProductSetting,
+} from '@/hooks/use-product-settings';
+import {
+  ProductSetting,
+  ProductSettingType,
+} from '@/services/product-settings.service';
 
-interface Setting {
-  id: string;
-  name: string;
-  value: string;
-}
 
-const mockPhoneTypes: Setting[] = [
-  { id: '1', name: 'Overseas', value: 'overseas' },
-  { id: '2', name: 'Local', value: 'local' },
-];
 
-const mockAccessoryTypes: Setting[] = [
-  { id: '1', name: 'Charger', value: 'charger' },
-  { id: '2', name: 'Earphone', value: 'earphone' },
-  { id: '3', name: 'Cover', value: 'cover' },
-  { id: '4', name: 'Glass', value: 'glass' },
-  { id: '5', name: 'Power Bank', value: 'power_bank' },
-];
-
-const mockConditions: Setting[] = [
-  { id: '1', name: 'Brand New', value: 'brand_new' },
-  { id: '2', name: 'Used', value: 'used' },
-  { id: '3', name: 'Like New', value: 'like_new' },
-];
-
-const mockRegions: Setting[] = [
-  { id: '1', name: 'USA', value: 'usa' },
-  { id: '2', name: 'Japan', value: 'japan' },
-  { id: '3', name: 'Australia', value: 'australia' },
-  { id: '4', name: 'UK', value: 'uk' },
-  { id: '5', name: 'European', value: 'european' },
-  { id: '6', name: 'Other', value: 'other' },
-];
-
-const mockUnits: Setting[] = [
-  { id: '1', name: 'Piece', value: 'piece' },
-  { id: '2', name: 'Box', value: 'box' },
-  { id: '3', name: 'Set', value: 'set' },
-  { id: '4', name: 'Pair', value: 'pair' },
-];
-
-function SettingSection({ 
-  title, 
-  description, 
-  items, 
-  onAdd, 
-  onEdit, 
-  onDelete 
-}: { 
+function SettingSection({
+  title,
+  description,
+  items,
+  onAdd,
+  onEdit,
+  onDelete,
+  isLoading,
+}: {
   title: string;
   description: string;
-  items: Setting[];
+  items: ProductSetting[];
   onAdd: () => void;
-  onEdit: (item: Setting) => void;
+  onEdit: (item: ProductSetting) => void;
   onDelete: (id: string) => void;
+  isLoading?: boolean;
 }) {
   return (
     <div className="space-y-4">
@@ -80,7 +53,16 @@ function SettingSection({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {items.map((item, index) => (
+        {isLoading ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-20" />
+          ))
+        ) : items.length === 0 ? (
+          <div className="col-span-full text-center py-8 text-muted-foreground">
+            No items found
+          </div>
+        ) : (
+          items.map((item, index) => (
           <motion.div
             key={item.id}
             initial={{ opacity: 0, scale: 0.9 }}
@@ -106,26 +88,26 @@ function SettingSection({
               </Button>
             </div>
           </motion.div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
 }
 
 export default function ProductSettingsPage() {
-  const [phoneTypes, setPhoneTypes] = useState(mockPhoneTypes);
-  const [accessoryTypes, setAccessoryTypes] = useState(mockAccessoryTypes);
-  const [conditions, setConditions] = useState(mockConditions);
-  const [regions, setRegions] = useState(mockRegions);
-  const [units, setUnits] = useState(mockUnits);
+  const { data: settings, isLoading } = useProductSettings();
+  const createMutation = useCreateProductSetting();
+  const updateMutation = useUpdateProductSetting();
+  const deleteMutation = useDeleteProductSetting();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [currentType, setCurrentType] = useState<'phone' | 'accessory' | 'condition' | 'region' | 'unit'>('phone');
-  const [editingItem, setEditingItem] = useState<Setting | null>(null);
+  const [currentType, setCurrentType] = useState<ProductSettingType>(ProductSettingType.PHONE_TYPE);
+  const [editingItem, setEditingItem] = useState<ProductSetting | null>(null);
   const [name, setName] = useState('');
   const [value, setValue] = useState('');
 
-  const handleAdd = (type: typeof currentType) => {
+  const handleAdd = (type: ProductSettingType) => {
     setCurrentType(type);
     setEditingItem(null);
     setName('');
@@ -133,7 +115,7 @@ export default function ProductSettingsPage() {
     setIsOpen(true);
   };
 
-  const handleEdit = (item: Setting, type: typeof currentType) => {
+  const handleEdit = (item: ProductSetting, type: ProductSettingType) => {
     setCurrentType(type);
     setEditingItem(item);
     setName(item.name);
@@ -141,31 +123,28 @@ export default function ProductSettingsPage() {
     setIsOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !value.trim()) {
-      toast.error('All fields are required');
-      return;
-    }
+    if (!name.trim() || !value.trim()) return;
 
-    const newItem: Setting = {
-      id: editingItem?.id || Date.now().toString(),
-      name,
-      value: value.toLowerCase().replace(/\s+/g, '_'),
+    const dto = {
+      type: currentType,
+      name: name.trim(),
+      value: value.trim().toLowerCase().replace(/\s+/g, '_'),
     };
 
     if (editingItem) {
-      toast.success('Updated successfully');
+      await updateMutation.mutateAsync({ id: editingItem.id, dto });
     } else {
-      toast.success('Added successfully');
+      await createMutation.mutateAsync(dto);
     }
 
     setIsOpen(false);
   };
 
-  const handleDelete = (id: string, type: typeof currentType) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this item?')) {
-      toast.success('Deleted successfully');
+      await deleteMutation.mutateAsync(id);
     }
   };
 
@@ -211,8 +190,20 @@ export default function ProductSettingsPage() {
               <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit">
-                {editingItem ? 'Update' : 'Create'}
+              <Button
+                type="submit"
+                disabled={createMutation.isPending || updateMutation.isPending}
+              >
+                {createMutation.isPending || updateMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : editingItem ? (
+                  'Update'
+                ) : (
+                  'Create'
+                )}
               </Button>
             </div>
           </form>
@@ -232,10 +223,11 @@ export default function ProductSettingsPage() {
           <SettingSection
             title="Phone Types"
             description="Types of phones (Overseas, Local, etc.)"
-            items={phoneTypes}
-            onAdd={() => handleAdd('phone')}
-            onEdit={(item) => handleEdit(item, 'phone')}
-            onDelete={(id) => handleDelete(id, 'phone')}
+            items={settings?.phoneTypes || []}
+            onAdd={() => handleAdd(ProductSettingType.PHONE_TYPE)}
+            onEdit={(item) => handleEdit(item, ProductSettingType.PHONE_TYPE)}
+            onDelete={handleDelete}
+            isLoading={isLoading}
           />
         </TabsContent>
 
@@ -243,10 +235,11 @@ export default function ProductSettingsPage() {
           <SettingSection
             title="Accessory Types"
             description="Types of accessories (Charger, Earphone, etc.)"
-            items={accessoryTypes}
-            onAdd={() => handleAdd('accessory')}
-            onEdit={(item) => handleEdit(item, 'accessory')}
-            onDelete={(id) => handleDelete(id, 'accessory')}
+            items={settings?.accessoryTypes || []}
+            onAdd={() => handleAdd(ProductSettingType.ACCESSORY_TYPE)}
+            onEdit={(item) => handleEdit(item, ProductSettingType.ACCESSORY_TYPE)}
+            onDelete={handleDelete}
+            isLoading={isLoading}
           />
         </TabsContent>
 
@@ -254,10 +247,11 @@ export default function ProductSettingsPage() {
           <SettingSection
             title="Product Conditions"
             description="Condition states (Brand New, Used, etc.)"
-            items={conditions}
-            onAdd={() => handleAdd('condition')}
-            onEdit={(item) => handleEdit(item, 'condition')}
-            onDelete={(id) => handleDelete(id, 'condition')}
+            items={settings?.conditions || []}
+            onAdd={() => handleAdd(ProductSettingType.CONDITION)}
+            onEdit={(item) => handleEdit(item, ProductSettingType.CONDITION)}
+            onDelete={handleDelete}
+            isLoading={isLoading}
           />
         </TabsContent>
 
@@ -265,10 +259,11 @@ export default function ProductSettingsPage() {
           <SettingSection
             title="Phone Regions"
             description="Import regions (USA, Japan, UK, etc.)"
-            items={regions}
-            onAdd={() => handleAdd('region')}
-            onEdit={(item) => handleEdit(item, 'region')}
-            onDelete={(id) => handleDelete(id, 'region')}
+            items={settings?.regions || []}
+            onAdd={() => handleAdd(ProductSettingType.REGION)}
+            onEdit={(item) => handleEdit(item, ProductSettingType.REGION)}
+            onDelete={handleDelete}
+            isLoading={isLoading}
           />
         </TabsContent>
 
@@ -276,10 +271,11 @@ export default function ProductSettingsPage() {
           <SettingSection
             title="Unit Types"
             description="Measurement units (Piece, Box, Set, etc.)"
-            items={units}
-            onAdd={() => handleAdd('unit')}
-            onEdit={(item) => handleEdit(item, 'unit')}
-            onDelete={(id) => handleDelete(id, 'unit')}
+            items={settings?.units || []}
+            onAdd={() => handleAdd(ProductSettingType.UNIT)}
+            onEdit={(item) => handleEdit(item, ProductSettingType.UNIT)}
+            onDelete={handleDelete}
+            isLoading={isLoading}
           />
         </TabsContent>
       </Tabs>

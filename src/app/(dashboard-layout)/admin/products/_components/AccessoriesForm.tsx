@@ -10,38 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import DateTimeField from './DateTimeField';
 import { MultiImageUpload } from './MultiImageUpload';
-
-// Mock data - Replace with API
-const mockBrands = [
-  { id: '1', name: 'Apple' },
-  { id: '2', name: 'Samsung' },
-  { id: '3', name: 'Anker' },
-  { id: '4', name: 'Baseus' },
-];
-
-const mockAccessoryTypes = [
-  { value: 'charger', label: 'Charger' },
-  { value: 'earphone', label: 'Earphone' },
-  { value: 'cover', label: 'Cover' },
-  { value: 'glass', label: 'Glass' },
-  { value: 'power_bank', label: 'Power Bank' },
-];
-
-
-
-const mockUnits = [
-  { value: 'piece', label: 'Piece' },
-  { value: 'box', label: 'Box' },
-  { value: 'set', label: 'Set' },
-  { value: 'pair', label: 'Pair' },
-];
-
-const mockSuppliers = [
-  { id: '1', name: 'Karim Accessories', phone: '01711111111' },
-  { id: '2', name: 'Global Tech', phone: '01822222222' },
-];
+import { useBrands } from '@/hooks/use-products';
+import { useProductSettings } from '@/hooks/use-product-settings';
+import { ProductSettingType } from '@/services/product-settings.service';
 
 export default function AccessoriesForm() {
+  const { data: brands, isLoading: brandsLoading } = useBrands();
+  const { data: settings, isLoading: settingsLoading } = useProductSettings();
   const [isNewSupplier, setIsNewSupplier] = useState(false);
   const [stockQty, setStockQty] = useState(1);
   const [barcodeStrategy, setBarcodeStrategy] = useState<'single' | 'unique'>('single');
@@ -60,25 +35,25 @@ export default function AccessoriesForm() {
           </div>
           <div>
             <Label>Accessory Type *</Label>
-            <Select required>
+            <Select required disabled={settingsLoading}>
               <SelectTrigger>
-                <SelectValue placeholder="Select type" />
+                <SelectValue placeholder={settingsLoading ? 'Loading...' : 'Select type'} />
               </SelectTrigger>
               <SelectContent>
-                {mockAccessoryTypes.map(type => (
-                  <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                {settings?.accessoryTypes.map(type => (
+                  <SelectItem key={type.id} value={type.value}>{type.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div>
             <Label>Brand</Label>
-            <Select>
+            <Select disabled={brandsLoading}>
               <SelectTrigger>
-                <SelectValue placeholder="Select brand" />
+                <SelectValue placeholder={brandsLoading ? 'Loading...' : 'Select brand'} />
               </SelectTrigger>
               <SelectContent>
-                {mockBrands.map(brand => (
+                {brands?.map(brand => (
                   <SelectItem key={brand.id} value={brand.id}>{brand.name}</SelectItem>
                 ))}
               </SelectContent>
@@ -98,13 +73,13 @@ export default function AccessoriesForm() {
           </div>
           <div>
             <Label>Unit Type</Label>
-            <Select>
+            <Select disabled={settingsLoading}>
               <SelectTrigger>
-                <SelectValue placeholder="Select unit" />
+                <SelectValue placeholder={settingsLoading ? 'Loading...' : 'Select unit'} />
               </SelectTrigger>
               <SelectContent>
-                {mockUnits.map(unit => (
-                  <SelectItem key={unit.value} value={unit.value}>{unit.label}</SelectItem>
+                {settings?.units.map(unit => (
+                  <SelectItem key={unit.id} value={unit.value}>{unit.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -233,18 +208,7 @@ export default function AccessoriesForm() {
           <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
             <div className="col-span-2">
               <Label>Select Supplier</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select existing supplier" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockSuppliers.map(supplier => (
-                    <SelectItem key={supplier.id} value={supplier.id}>
-                      {supplier.name} {supplier.phone ? `(${supplier.phone})` : ''}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input placeholder="Supplier selection - API integration pending" disabled />
             </div>
           </div>
         )}
